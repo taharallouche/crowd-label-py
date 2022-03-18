@@ -24,15 +24,7 @@ The data that we used was originally collected in:
 The above paper designs mechanisms to incentivize crowdsourcing workers to answer truthfully in approval voting settings.
 
 **Code:**\
-Here we succintly present the main functions in the [python file](Experiments_Text_Lang_Anim.py):
-- *prepare_data(data)*: This function takes the name of the dataset to prepare (Animals, Languages or Textures) and create two pandas dataframes:
-  - Ground Truth: contains the correct answer for each instance (as a binary vector).
-  - Annotations: contains each voter's answer for each instance (also as a binary vector).
-- *weighted_approval_qw(annotations,data)*: Here qw stands for "question-wise". This function takes an annotations dataframe and the name of the associated dataset
-then it applies weighted approval voting to each instance and outputs a dataframe containing the aggregated answers. The weights of each voter in each instance is
-estimated based on the size of her ballot by the formula that we explicited for the Condorcet noise model.
-- *mallows_weight(annotations,data,distance):* This funtion is similar to *weighted_approval_qw*. The sole difference is that weights are computed according to the
-Mallows noise model with input distance.
+Here we succintly present the main function in the [python file](Experiments.py):
 - *compare_methods_qw(n_batch, data)*: This function compare the accuracy of different aggregation methods across the chosen dataset for different number of voters.
 It samples *n_batch* batches for each number of voters, and average the precision over them.
 
