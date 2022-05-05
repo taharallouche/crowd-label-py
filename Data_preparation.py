@@ -69,5 +69,4 @@ def prepare_data(data="animals"):
             for alternative in Alternatives:
                 row[alternative] = int(alternative in L)
             Annotations = Annotations.append(row, ignore_index=True)
-
     return Annotations, GroundTruth
