@@ -184,7 +184,7 @@ def weighted_approval(Annotations):
 
             # The estimated reliability of the voter in this question
             #p = (m - 1 - s) / (m - 2)
-            p = 1- abs(s-2)/m
+            p = (m-2-s)/(m-4)
             p = p.values[0]            #p = 1- abs(s-2)/m
 
             # The weight of this voter in this question
@@ -230,7 +230,7 @@ def compare_methods_qw(n_batch=25, path="Data/Multi_Winner/data_quiz_foot.csv"):
     # Set the maximum number of voters
     n = 65
     # initialize the accuracy array
-    Acc = np.zeros([5, n_batch, n - 1])
+    Acc = np.zeros([3, n_batch, n - 1])
     for num in range(1, n):
         print("Number of Voters :", num)
         for batch in range(n_batch):
@@ -252,13 +252,13 @@ def compare_methods_qw(n_batch=25, path="Data/Multi_Winner/data_quiz_foot.csv"):
             Weighted_Top_2 = Weighted_Top_2[Alternatives].to_numpy().astype(int)
 
             # Compute the accuracy of each method
-            Acc[0, batch, num - 1] = 1 - zero_one_loss(G, Top_2)
-            Acc[1, batch, num - 1] = 1 - zero_one_loss(G, Mode)
-            Acc[2, batch, num - 1] = 1 - zero_one_loss(G, Weighted_Top_2)
+            Acc[0, batch, num - 1] = 1 - hamming_loss(G, Top_2)
+            Acc[1, batch, num - 1] = 1 - hamming_loss(G, Mode)
+            Acc[2, batch, num - 1] = 1 - hamming_loss(G, Weighted_Top_2)
 
     # Plot the evolution of the accuracies of the methods when the number of voters grows
     fig = plt.figure()
-    Zero_one_margin = np.zeros([5, n - 1, 3])
+    Zero_one_margin = np.zeros([3, n - 1, 3])
     for num in range(1, n):
         Zero_one_margin[0, num - 1, :] = confidence_margin_mean(Acc[0, :, num - 1])
         Zero_one_margin[1, num - 1, :] = confidence_margin_mean(Acc[1, :, num - 1])
@@ -276,4 +276,4 @@ def compare_methods_qw(n_batch=25, path="Data/Multi_Winner/data_quiz_foot.csv"):
     plt.legend()
     plt.xlabel("Number of voters")
     plt.ylabel("Accuracy")
-    plt.title("Football quiz Loss")
+    plt.title("Hamming Accuracy")
