@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import ray
 
 # Import functions from files
-from Data_preparation import prepare_data
+from data_preparation import prepare_data
 from aggregation_rules import simple_approval, mallows_weight, weighted_approval_qw
 from utils import confidence_margin_mean
 
@@ -14,7 +14,7 @@ from utils import confidence_margin_mean
 ray.init()
 
 
-def compare_methods_qw(n_batch=25, data="animals"):
+def compare_methods(n_batch: int = 25, data: str = "animals") -> None:
     """
     Plots the averaged accuracy of different aggregation methods over number of batches for different number of voters.
     :param n_batch: the number of batches of voters for each number of voter.
@@ -26,7 +26,16 @@ def compare_methods_qw(n_batch=25, data="animals"):
     elif data == "textures":
         Alternatives = ["Gravel", "Grass", "Brick", "Wood", "Sand", "Cloth"]
     else:
-        Alternatives = ["Hebrew", "Russian", "Japanese", "Thai", "Chinese", "Tamil", "Latin", "Hindi"]
+        Alternatives = [
+            "Hebrew",
+            "Russian",
+            "Japanese",
+            "Thai",
+            "Chinese",
+            "Tamil",
+            "Latin",
+            "Hindi",
+        ]
 
     # Initialize the Annotation and GroundTruth dataframes
     Anno, GroundTruth = prepare_data(data)
@@ -44,9 +53,14 @@ def compare_methods_qw(n_batch=25, data="animals"):
 
             # Apply the majority and different weighted rules to aggregate the answers in parallel
             maj, weight_sqrt_ham, weight_jaccard, weight_dice, weight_qw = ray.get(
-                [simple_approval.remote(Annotations, data), mallows_weight.remote(Annotations, data, "Euclid"),
-                 mallows_weight.remote(Annotations, data, "Jaccard"), mallows_weight.remote(Annotations, data, "Dice"),
-                 weighted_approval_qw.remote(Annotations, data)])
+                [
+                    simple_approval.remote(Annotations, data),
+                    mallows_weight.remote(Annotations, data, "Euclid"),
+                    mallows_weight.remote(Annotations, data, "Jaccard"),
+                    mallows_weight.remote(Annotations, data, "Dice"),
+                    weighted_approval_qw.remote(Annotations, data),
+                ]
+            )
 
             # Put results into numpy arrays
             G = GroundTruth[Alternatives].to_numpy().astype(int)
@@ -73,25 +87,49 @@ def compare_methods_qw(n_batch=25, data="animals"):
         Zero_one_margin[3, num - 1, :] = confidence_margin_mean(Acc[3, :, num - 1])
         Zero_one_margin[4, num - 1, :] = confidence_margin_mean(Acc[4, :, num - 1])
 
-    plt.errorbar(range(1, n), Zero_one_margin[0, :, 0], label='Simple', linestyle="solid")
-    plt.fill_between(range(1, n), Zero_one_margin[0, :, 1], Zero_one_margin[0, :, 2], alpha=0.2)
+    plt.errorbar(
+        range(1, n), Zero_one_margin[0, :, 0], label="Simple", linestyle="solid"
+    )
+    plt.fill_between(
+        range(1, n), Zero_one_margin[0, :, 1], Zero_one_margin[0, :, 2], alpha=0.2
+    )
 
-    plt.errorbar(range(1, n), Zero_one_margin[4, :, 0], label='Condorcet', linestyle="dotted")
-    plt.fill_between(range(1, n), Zero_one_margin[4, :, 1], Zero_one_margin[4, :, 2], alpha=0.2)
+    plt.errorbar(
+        range(1, n), Zero_one_margin[4, :, 0], label="Condorcet", linestyle="dotted"
+    )
+    plt.fill_between(
+        range(1, n), Zero_one_margin[4, :, 1], Zero_one_margin[4, :, 2], alpha=0.2
+    )
 
-    plt.errorbar(range(1, n), Zero_one_margin[1, :, 0], label="Euclid", linestyle="dashdot")
-    plt.fill_between(range(1, n), Zero_one_margin[1, :, 1], Zero_one_margin[1, :, 2], alpha=0.2)
+    plt.errorbar(
+        range(1, n), Zero_one_margin[1, :, 0], label="Euclid", linestyle="dashdot"
+    )
+    plt.fill_between(
+        range(1, n), Zero_one_margin[1, :, 1], Zero_one_margin[1, :, 2], alpha=0.2
+    )
 
-    plt.errorbar(range(1, n), Zero_one_margin[2, :, 0], label="Jaccard", linestyle="dashed")
-    plt.fill_between(range(1, n), Zero_one_margin[2, :, 1], Zero_one_margin[2, :, 2], alpha=0.2)
+    plt.errorbar(
+        range(1, n), Zero_one_margin[2, :, 0], label="Jaccard", linestyle="dashed"
+    )
+    plt.fill_between(
+        range(1, n), Zero_one_margin[2, :, 1], Zero_one_margin[2, :, 2], alpha=0.2
+    )
 
-    plt.errorbar(range(1, n), Zero_one_margin[3, :, 0], label='Dice', linestyle=(0, (3, 5, 1, 5)))
-    plt.fill_between(range(1, n), Zero_one_margin[3, :, 1], Zero_one_margin[3, :, 2], alpha=0.2)
+    plt.errorbar(
+        range(1, n), Zero_one_margin[3, :, 0], label="Dice", linestyle=(0, (3, 5, 1, 5))
+    )
+    plt.fill_between(
+        range(1, n), Zero_one_margin[3, :, 1], Zero_one_margin[3, :, 2], alpha=0.2
+    )
 
     plt.legend()
     plt.xlabel("Number of voters")
     plt.ylabel("Accuracy")
     plt.title(data)
+    plt.show()
 
 
-
+if __name__ == "__main__":
+    data = input("Select a dataset [animals|textures|languages]: ")
+    n_batch = int(input("Choose the number of batches: "))
+    compare_methods(n_batch, data)
