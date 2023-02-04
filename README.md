@@ -24,7 +24,10 @@ The data that we used was originally collected in:
 The above paper designs mechanisms to incentivize crowdsourcing workers to answer truthfully in approval voting settings.
 
 **Code:**\
-Here we succintly present the main function in the [python file](Experiments.py):
-- *compare_methods_qw(n_batch, data)*: This function compare the accuracy of different aggregation methods across the chosen dataset for different number of voters.
+Here we succintly present the main function in the [python file](experiments.py):
+- `compare_methods(n_batch, data)`: This function compare the accuracy of different aggregation methods across the chosen dataset for different number of voters.
 It samples *n_batch* batches for each number of voters, and average the precision over them.
 
+To run the experiments, run the command:\
+`python3 src/experiments.py`\
+You will be asked to select the *dataset* (animals, textures or languages) and the *number of batches*.
