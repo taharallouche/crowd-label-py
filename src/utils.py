@@ -1,9 +1,7 @@
-# import dependencies
 import numpy as np
 import scipy.stats
 
 
-# Computes the 0.95 confidence interval
 def confidence_margin_mean(
     data: np.ndarray, confidence: float = 0.95
 ) -> "tuple[np.ndarray, np.ndarray, np.ndarray]":
