@@ -1,52 +1,43 @@
-# import dependencies
-import numpy as np
-from sklearn.metrics import zero_one_loss, hamming_loss
 import random
-import matplotlib.pyplot as plt
-import ray
 
-# Import functions from files
+import matplotlib.pyplot as plt
+import numpy as np
+import ray
+from sklearn.metrics import zero_one_loss
+
+from aggregation_rules import mallows_weight, simple_approval, weighted_approval_qw
+from inventory import data_infos, DataInfos
 from data_preparation import prepare_data
-from aggregation_rules import simple_approval, mallows_weight, weighted_approval_qw
 from utils import confidence_margin_mean
 
 # Initialize ray for parallel computing
 ray.init()
 
 
-def compare_methods(n_batch: int = 25, data: str = "animals") -> None:
+def compare_methods(n_batch: int, dataset_info: DataInfos) -> None:
     """
     Plots the averaged accuracy of different aggregation methods over number of batches for different number of voters.
     :param n_batch: the number of batches of voters for each number of voter.
     :param data: name of the dataset
     :return: None
     """
-    if data == "animals":
-        Alternatives = ["Leopard", "Tiger", "Puma", "Jaguar", "Lion(ess)", "Cheetah"]
-    elif data == "textures":
-        Alternatives = ["Gravel", "Grass", "Brick", "Wood", "Sand", "Cloth"]
-    else:
-        Alternatives = [
-            "Hebrew",
-            "Russian",
-            "Japanese",
-            "Thai",
-            "Chinese",
-            "Tamil",
-            "Latin",
-            "Hindi",
-        ]
+
+    Alternatives = dataset_info.alternatives
 
     # Initialize the Annotation and GroundTruth dataframes
-    Anno, GroundTruth = prepare_data(data)
+    Anno, GroundTruth = prepare_data(dataset_info)
+
     # Set the maximum number of voters
-    n = 100
+    n = 20
+
     # initialize the accuracy array
     Acc = np.zeros([5, n_batch, n - 1])
     for num in range(1, n):
+
         print("Number of Voters :", num)
         for batch in range(n_batch):
             print("###### Batch ", batch, " ######")
+
             # Randomly sample num voters
             voters = random.sample(list(Anno.Voter.unique()), num)
             Annotations = Anno[Anno["Voter"].isin(voters)]
@@ -54,11 +45,11 @@ def compare_methods(n_batch: int = 25, data: str = "animals") -> None:
             # Apply the majority and different weighted rules to aggregate the answers in parallel
             maj, weight_sqrt_ham, weight_jaccard, weight_dice, weight_qw = ray.get(
                 [
-                    simple_approval.remote(Annotations, data),
-                    mallows_weight.remote(Annotations, data, "Euclid"),
-                    mallows_weight.remote(Annotations, data, "Jaccard"),
-                    mallows_weight.remote(Annotations, data, "Dice"),
-                    weighted_approval_qw.remote(Annotations, data),
+                    simple_approval.remote(Annotations, dataset_info),
+                    mallows_weight.remote(Annotations, dataset_info, "Euclid"),
+                    mallows_weight.remote(Annotations, dataset_info, "Jaccard"),
+                    mallows_weight.remote(Annotations, dataset_info, "Dice"),
+                    weighted_approval_qw.remote(Annotations, dataset_info),
                 ]
             )
 
@@ -71,65 +62,48 @@ def compare_methods(n_batch: int = 25, data: str = "animals") -> None:
             Maj = maj[Alternatives].to_numpy().astype(int)
 
             # Compute the accuracy of each method
-            Acc[0, batch, num - 1] = 1 - zero_one_loss(G, Maj)
-            Acc[1, batch, num - 1] = 1 - zero_one_loss(G, Weight_sqrt_ham)
-            Acc[2, batch, num - 1] = 1 - zero_one_loss(G, Weight_jaccard)
-            Acc[3, batch, num - 1] = 1 - zero_one_loss(G, Weight_dice)
-            Acc[4, batch, num - 1] = 1 - zero_one_loss(G, Weight_qw)
+            methods = (Maj, Weight_sqrt_ham, Weight_jaccard, Weight_dice, Weight_qw)
+            for i, method in enumerate(methods):
+                Acc[i, batch, num - 1] = 1 - zero_one_loss(G, method)
 
     # Plot the evolution of the accuracies of the methods when the number of voters grows
     fig = plt.figure()
     Zero_one_margin = np.zeros([5, n - 1, 3])
     for num in range(1, n):
-        Zero_one_margin[0, num - 1, :] = confidence_margin_mean(Acc[0, :, num - 1])
-        Zero_one_margin[1, num - 1, :] = confidence_margin_mean(Acc[1, :, num - 1])
-        Zero_one_margin[2, num - 1, :] = confidence_margin_mean(Acc[2, :, num - 1])
-        Zero_one_margin[3, num - 1, :] = confidence_margin_mean(Acc[3, :, num - 1])
-        Zero_one_margin[4, num - 1, :] = confidence_margin_mean(Acc[4, :, num - 1])
+        for i in range(len(methods)):
+            Zero_one_margin[i, num - 1, :] = confidence_margin_mean(Acc[i, :, num - 1])
 
-    plt.errorbar(
-        range(1, n), Zero_one_margin[0, :, 0], label="Simple", linestyle="solid"
-    )
-    plt.fill_between(
-        range(1, n), Zero_one_margin[0, :, 1], Zero_one_margin[0, :, 2], alpha=0.2
-    )
+    plot_otions = {
+        "SAV": {"linestyle": "solid", "index": 0},
+        "Euclid": {"linestyle": "dashdot", "index": 1},
+        "Jaccard": {"linestyle": "dashed", "index": 2},
+        "Dice": {"linestyle": (0, (3, 5, 1, 5)), "index": 3},
+        "Condorcet": {"linestyle": "dotted", "index": 4},
+    }
 
-    plt.errorbar(
-        range(1, n), Zero_one_margin[4, :, 0], label="Condorcet", linestyle="dotted"
-    )
-    plt.fill_between(
-        range(1, n), Zero_one_margin[4, :, 1], Zero_one_margin[4, :, 2], alpha=0.2
-    )
-
-    plt.errorbar(
-        range(1, n), Zero_one_margin[1, :, 0], label="Euclid", linestyle="dashdot"
-    )
-    plt.fill_between(
-        range(1, n), Zero_one_margin[1, :, 1], Zero_one_margin[1, :, 2], alpha=0.2
-    )
-
-    plt.errorbar(
-        range(1, n), Zero_one_margin[2, :, 0], label="Jaccard", linestyle="dashed"
-    )
-    plt.fill_between(
-        range(1, n), Zero_one_margin[2, :, 1], Zero_one_margin[2, :, 2], alpha=0.2
-    )
-
-    plt.errorbar(
-        range(1, n), Zero_one_margin[3, :, 0], label="Dice", linestyle=(0, (3, 5, 1, 5))
-    )
-    plt.fill_between(
-        range(1, n), Zero_one_margin[3, :, 1], Zero_one_margin[3, :, 2], alpha=0.2
-    )
+    for method, options in plot_otions.items():
+        plt.errorbar(
+            range(1, n),
+            Zero_one_margin[options["index"], :, 0],
+            label=method,
+            linestyle=options["linestyle"],
+        )
+        plt.fill_between(
+            range(1, n),
+            Zero_one_margin[options["index"], :, 1],
+            Zero_one_margin[options["index"], :, 2],
+            alpha=0.2,
+        )
 
     plt.legend()
     plt.xlabel("Number of voters")
     plt.ylabel("Accuracy")
-    plt.title(data)
+    plt.title(dataset_info.name)
     plt.show()
 
 
 if __name__ == "__main__":
-    data = input("Select a dataset [animals|textures|languages]: ")
+    dataset_name = input("Select a dataset [animals|textures|languages]: ")
+    dataset_info = data_infos[dataset_name]
     n_batch = int(input("Choose the number of batches: "))
-    compare_methods(n_batch, data)
+    compare_methods(n_batch, dataset_info)

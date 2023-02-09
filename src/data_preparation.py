@@ -1,9 +1,8 @@
-# Import dependencies
 import pandas as pd
+from inventory import DataInfos
 
 
-# Read csv to pandas dataframe
-def prepare_data(data: str = "animals") -> "tuple[pd.DataFrame, pd.DataFrame]":
+def prepare_data(dataset_info: DataInfos) -> "tuple[pd.DataFrame, pd.DataFrame]":
     """
     This function prepares two dataframes: one containing the ground truths of the instances and one containing the
     annotations. Each row contains the question, the voter, and a binary vector whose coordinates equal one if and
@@ -12,28 +11,9 @@ def prepare_data(data: str = "animals") -> "tuple[pd.DataFrame, pd.DataFrame]":
      :return: Annotations and GroundTruths dataframes
     """
 
-    # Setting the path to the dataset and some of its properties
-    if data == "animals":
-        path = "data/data_animals.csv"
-        nbr_questions = 16
-        Alternatives = ["Leopard", "Tiger", "Puma", "Jaguar", "Lion(ess)", "Cheetah"]
-    elif data == "textures":
-        path = "data/data_textures.csv"
-        nbr_questions = 16
-        Alternatives = ["Gravel", "Grass", "Brick", "Wood", "Sand", "Cloth"]
-    else:
-        path = "data/data_languages.csv"
-        nbr_questions = 25
-        Alternatives = [
-            "Hebrew",
-            "Russian",
-            "Japanese",
-            "Thai",
-            "Chinese",
-            "Tamil",
-            "Latin",
-            "Hindi",
-        ]
+    path = dataset_info.path
+    nbr_questions = dataset_info.nbr_questions
+    Alternatives = dataset_info.alternatives
 
     # Reading Dataset
     Data_brut = pd.read_csv(
