@@ -23,23 +23,18 @@ def simple_approval(Annotations: pd.DataFrame, dataset_info: DataInfos) -> pd.Da
 
     # Applying majority rule for each question
     for i in range(len(Questions)):
-        # compute the number of approvals for each alternative
-        L = [
-            int(
-                sum(
-                    Annotations.loc[
-                        Annotations["Question"] == Questions[i], alternative
-                    ]
-                )
-            )
-            for alternative in Alternatives
+        # get the alternative with maximum approvals
+        k = (
+            Annotations.loc[Annotations["Question"] == Questions[i], Alternatives]
+            .sum()
+            .idxmax()
+        )
+
+        # add the result to the aggregation dataframe
+        agg_majority.loc[i] = [Questions[i]] + [
+            alternative == k for alternative in Alternatives
         ]
 
-        # Search for the alternative with maximum approvals and add it to the aggregation dataframe
-        k = L.index(max(L))
-        agg_majority.loc[i] = [Questions[i]] + [
-            t == k for t in range(0, len(Alternatives))
-        ]
     return agg_majority
 
 
@@ -83,35 +78,12 @@ def weighted_approval_qw(
         # The weight of each voter in this question
         weights["Weight"] = np.log(p / (1 - p))
 
-        # List to contain the weighted approval scores of each alternative
-        L = []
-        for alternative in Alternatives:
-
-            # Compute the weighted approval score of each alternative
-            L += [
-                sum(
-                    [
-                        weights.loc[weights.Voter == voter, "Weight"].values[0]
-                        for voter in weights["Voter"]
-                        if (
-                            (
-                                Annotations.loc[
-                                    (Annotations.Voter == voter)
-                                    & (Annotations.Question == Questions[i]),
-                                    alternative,
-                                ].values[0]
-                                == 1
-                            )
-                        )
-                    ]
-                )
-            ]
-
-        # Search for the alternative with maximum score and add it to the aggregation dataframe
-        k = L.index(max(L))
+        L = np.matmul(weights["Weight"].T, D[n * i : n * (i + 1), :])
+        k = np.argmax(L)
         agg_weighted.loc[i] = [Questions[i]] + [
             t == k for t in range(0, len(Alternatives))
         ]
+
     return agg_weighted
 
 
@@ -143,50 +115,20 @@ def mallows_weight(
     n = len(list(weights["Voter"]))
     D = Annotations.loc[:, Alternatives].to_numpy()
     for i in range(len(Questions)):
-        j = 0
-        for voter in list(weights["Voter"]):
+        # Compute the weight of each voter according to the chosen distance
+        if distance == "Euclid":
+            weights["Weight"] = np.sqrt(
+                np.sum(D[n * i : n * (i + 1), :], axis=1) + 1
+            ) - np.sqrt(np.sum(D[n * i : n * (i + 1), :], axis=1) - 1)
+        elif distance == "Jaccard":
+            weights["Weight"] = 1 / np.sum(D[n * i : n * (i + 1), :], axis=1)
+        elif distance == "Dice":
+            weights["Weight"] = 2 / (np.sum(D[n * i : n * (i + 1), :], axis=1) + 1)
 
-            # Compute the number of selected alternatives by the voter for the question
-            s = np.sum(D[n * i + j, :])
-
-            # Compute the weight for each voter according to the chosen distance
-            if distance == "Euclid":
-                weights.loc[weights.Voter == voter, "Weight"] = np.sqrt(
-                    s + 1
-                ) - np.sqrt(s - 1)
-            elif distance == "Jaccard":
-                weights.loc[weights.Voter == voter, "Weight"] = 1 / s
-            elif distance == "Dice":
-                weights.loc[weights.Voter == voter, "Weight"] = 2 / (s + 1)
-            j += 1
-
-        # List to contain the weighted approval score of each alternative
-        L = []
-        for alternative in Alternatives:
-
-            # Compute the weighted approval score of each alternative
-            L += [
-                sum(
-                    [
-                        weights.loc[weights.Voter == voter, "Weight"].values[0]
-                        for voter in weights["Voter"]
-                        if (
-                            (
-                                Annotations.loc[
-                                    (Annotations.Voter == voter)
-                                    & (Annotations.Question == Questions[i]),
-                                    alternative,
-                                ].values[0]
-                                == 1
-                            )
-                        )
-                    ]
-                )
-            ]
-
-        # Search for the alternative with the highest score and add it to the aggregation dataframe
-        k = L.index(max(L))
+        L = np.matmul(weights["Weight"].T, D[n * i : n * (i + 1), :])
+        k = np.argmax(L)
         agg_weighted.loc[i] = [Questions[i]] + [
             t == k for t in range(0, len(Alternatives))
         ]
+
     return agg_weighted
