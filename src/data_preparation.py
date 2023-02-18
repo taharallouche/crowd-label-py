@@ -61,5 +61,6 @@ def prepare_data(dataset_info: DataInfos) -> "tuple[pd.DataFrame, pd.DataFrame]"
             for alternative in Alternatives:
                 row[alternative] = int(alternative in L)
             Annotations = Annotations.append(row, ignore_index=True)
+    Annotations[Alternatives] = Annotations[Alternatives].astype(int)
 
     return Annotations, GroundTruth
