@@ -1,5 +1,19 @@
 import numpy as np
 import scipy.stats
+from typing import Optional
+import os
+
+
+def get_data_folder_path(dataset_name: Optional[str]) -> Optional[str]:
+    current_dir = os.path.abspath(os.getcwd())
+    while current_dir != "/":  # Stop at the root directory
+        if os.path.isdir(os.path.join(current_dir, "data")):
+            current_dir = os.path.join(current_dir, "data")
+            break
+        data_folder = os.path.join(os.path.dirname(current_dir), "data")
+        return f"{data_folder}/data_{dataset_name}.csv"
+    else:
+        raise Exception("Could not find the 'data' folder")
 
 
 def confidence_margin_mean(
