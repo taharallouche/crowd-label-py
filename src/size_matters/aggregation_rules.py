@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import ray
 
-from inventory import DataInfos
+from size_matters.inventory import DataInfos
 
 
 @ray.remote

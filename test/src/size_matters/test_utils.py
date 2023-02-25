@@ -1,10 +1,7 @@
 import pytest
 import numpy as np
-import os
-import sys
 
-sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../src"))
-from utils import confidence_margin_mean
+from src.size_matters.utils import confidence_margin_mean
 
 
 # write a pytest unit test function that tests confidence_margin_mean parametrized

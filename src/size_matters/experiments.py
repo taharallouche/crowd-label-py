@@ -5,10 +5,14 @@ import numpy as np
 import ray
 from sklearn.metrics import zero_one_loss
 
-from aggregation_rules import mallows_weight, simple_approval, weighted_approval_qw
-from inventory import data_infos, DataInfos
-from data_preparation import prepare_data
-from utils import confidence_margin_mean
+from size_matters.aggregation_rules import (
+    mallows_weight,
+    simple_approval,
+    weighted_approval_qw,
+)
+from size_matters.inventory import data_infos, DataInfos
+from size_matters.data_preparation import prepare_data
+from size_matters.utils import confidence_margin_mean
 
 # Initialize ray for parallel computing
 ray.init()

@@ -1,5 +1,5 @@
 import pandas as pd
-from inventory import DataInfos
+from size_matters.inventory import DataInfos
 
 
 def prepare_data(dataset_info: DataInfos) -> "tuple[pd.DataFrame, pd.DataFrame]":
