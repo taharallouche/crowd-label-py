@@ -1,10 +1,9 @@
-import pytest
 import numpy as np
+import pytest
 
 from src.size_matters.utils import confidence_margin_mean
 
 
-# write a pytest unit test function that tests confidence_margin_mean parametrized
 @pytest.mark.ut
 @pytest.mark.parametrize(
     "data, confidence, expected",

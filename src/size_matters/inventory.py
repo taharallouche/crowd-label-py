@@ -26,7 +26,16 @@ TEXTURES_DATA_INFO = DataInfos(
 LANGUAGE_DATA_INFO = DataInfos(
     "languages",
     "data/data_languages.csv",
-    ["Hebrew", "Russian", "Japanese", "Thai", "Chinese", "Tamil", "Latin", "Hindi"],
+    [
+        "Hebrew",
+        "Russian",
+        "Japanese",
+        "Thai",
+        "Chinese",
+        "Tamil",
+        "Latin",
+        "Hindi",
+    ],
     25,
 )
 
