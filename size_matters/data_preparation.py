@@ -1,14 +1,19 @@
 import pandas as pd
+
 from size_matters.inventory import DataInfos
 
 
-def prepare_data(dataset_info: DataInfos) -> "tuple[pd.DataFrame, pd.DataFrame]":
+def prepare_data(
+    dataset_info: DataInfos,
+) -> "tuple[pd.DataFrame, pd.DataFrame]":
     """
-    This function prepares two dataframes: one containing the ground truths of the instances and one containing the
-    annotations. Each row contains the question, the voter, and a binary vector whose coordinates equal one if and
-    only if the associated alternative is selected by the voter.
-     :param data: name of the dataset: "animals","textures" or "languages".
-     :return: Annotations and GroundTruths dataframes
+    returns two dataframes: one containing the ground truths of the instances,
+    and one containing the annotations.
+    Each row contains the question, the voter, and a binary vector whose
+    coordinates equal one if and only if the associated alternative
+    is selected by the voter.
+    :param data: name of the dataset: "animals","textures" or "languages".
+    :return: Annotations and GroundTruths dataframes
     """
 
     path = dataset_info.path
