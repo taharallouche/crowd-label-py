@@ -1,12 +1,3 @@
----
-name: Custom issue template
-about: Standard issue
-title: ''
-labels: ''
-assignees: ''
-
----
-
 ### Description
 
 
@@ -15,5 +6,4 @@ assignees: ''
 
 ### Success Criteria
 
-
-### Contributors
+#### Contributors
