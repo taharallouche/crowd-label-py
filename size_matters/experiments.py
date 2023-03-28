@@ -32,7 +32,7 @@ def compare_methods(n_batch: int, dataset_info: DataInfos) -> None:
     Anno, GroundTruth = prepare_data(dataset_info)
 
     # Set the maximum number of voters
-    n = 5
+    n = 100
 
     # initialize the accuracy array
     Acc = np.zeros([5, n_batch, n - 1])

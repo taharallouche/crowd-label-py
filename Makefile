@@ -48,13 +48,13 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint/flake8: ## check style with flake8
-	flake8 src tests --count
+	flake8 size_matters tests --count
 
 lint/black: ## check style with black
-	black --check src tests
+	black --check size_matters tests
 
 lint: lint/flake8 lint/black ## check style
-	python -m mypy src
+	python -m mypy size_matters
 
 test:  ## run tests quickly with the default Python
 	@git fetch --all

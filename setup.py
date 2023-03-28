@@ -1,15 +1,19 @@
 from setuptools import find_packages, setup
 
+description = (
+    "A python package for the aggregation of collectively,"
+    " annotated data using the size-matters principle"
+)
+
 setup(
     name="size_matters",
     version="0.1.0",
-    description="A python package for the aggregation of collectively annotated data using the size-matters principle",
+    description=description,
     url="https://github.com/taharallouche/Truth_Tracking-via-AV",
     author="Tahar Allouche",
     author_email="tahar.allouche@dauphine.eu",
     license="BSD 2-clause",
-    packages=find_packages(),
-    package_dir={"": "src"},
+    packages=find_packages("size_matters", "tests"),
     install_requires=[
         "numpy>=1.24.1",
         "scipy>=1.10.0",
@@ -19,6 +23,7 @@ setup(
         "ray>=2.2.0",
         "tornado>=6.2",
     ],
+    test_suite="tests",
     classifiers=[
         "Development Status :: 1 - Planning",
         "Intended Audience :: Science/Research",

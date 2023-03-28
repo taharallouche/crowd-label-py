@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from src.size_matters.utils import confidence_margin_mean
+from size_matters.utils import confidence_margin_mean
 
 
 @pytest.mark.ut
