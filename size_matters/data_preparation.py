@@ -3,69 +3,79 @@ import pandas as pd
 from size_matters.inventory import Dataset
 
 
-def prepare_data(
-    dataset: Dataset,
-) -> "tuple[pd.DataFrame, pd.DataFrame]":
-    """
-    returns two dataframes: one containing the ground truths of the instances,
-    and one containing the annotations.
-    Each row contains the question, the voter, and a binary vector whose
-    coordinates equal one if and only if the associated alternative
-    is selected by the voter.
-    :param data: name of the dataset: "animals","textures" or "languages".
-    :return: Annotations and GroundTruths dataframes
-    """
+def _get_column_names(name: str, nbr_questions: int) -> "list[str]":
+    return [f"{name}{i}" for i in range(nbr_questions)]
 
+
+def _get_columns(nbr_questions: int) -> "list[str]":
+    columns = (
+        _get_column_names("Question", nbr_questions)
+        + _get_column_names("TrueAnswer", nbr_questions)
+        + _get_column_names("Answer", nbr_questions)
+    )
+    return columns
+
+
+def _read_raw_data(dataset: Dataset) -> pd.DataFrame:
     path = dataset.path
     nbr_questions = dataset.nbr_questions
-    Alternatives = dataset.alternatives
-
-    # Reading Dataset
-    Data_brut = pd.read_csv(
+    columns = _get_columns(nbr_questions)
+    raw_data = pd.read_csv(
         path,
         delimiter=",",
         index_col=False,
         header=0,
-        names=["Interface", "Mechanism"]
-        + ["Question" + str(i) for i in range(0, nbr_questions)]
-        + ["TrueAnswer" + str(i) for i in range(0, nbr_questions)]
-        + ["Answer" + str(i) for i in range(0, nbr_questions)]
-        + ["Comments"],
-        usecols=["Interface"]
-        + ["Question" + str(i) for i in range(0, nbr_questions)]
-        + ["TrueAnswer" + str(i) for i in range(0, nbr_questions)]
-        + ["Answer" + str(i) for i in range(0, nbr_questions)],
+        names=["Interface", "Mechanism", *columns, "Comments"],
+        usecols=["Interface", *columns],
     )
+    raw_data = raw_data.loc[raw_data.Interface == "subset", columns]
+    return raw_data
 
-    # Cleaning the data
-    Data_brut = Data_brut.loc[Data_brut.Interface == "subset"]
-    del Data_brut["Interface"]
 
-    # Preparing GroundTruth Dataframe
-    Questions = Data_brut.iloc[0, 0:nbr_questions].to_numpy()
-    GroundTruth = pd.DataFrame(columns=["Question"] + Alternatives)
-    for i in range(len(Questions)):
-        L = Data_brut.iloc[0, i + nbr_questions]
-        row = {"Question": Questions[i]}
-        for alternative in Alternatives:
+def _get_ground_truth(
+    raw_data: pd.DataFrame, nbr_questions: int, alternatives: "list[str]"
+) -> pd.DataFrame:
+    questions = raw_data.iloc[0, 0:nbr_questions].to_numpy()
+    groundtruth = pd.DataFrame(columns=["Question"] + alternatives)
+    for i in range(len(questions)):
+        L = raw_data.iloc[0, i + nbr_questions]
+        row = {"Question": questions[i]}
+        for alternative in alternatives:
             row[alternative] = int(alternative == L)
-        GroundTruth = GroundTruth.append(row, ignore_index=True)
+        groundtruth = groundtruth.append(row, ignore_index=True)
+    return groundtruth
 
-    # Preparing Annotations Dataframe
-    Annotations = pd.DataFrame(columns=["Voter", "Question"] + Alternatives)
-    for i in range(len(Questions)):
-        for j in range(Data_brut.shape[0]):
+
+def _get_annotations(
+    raw_data: pd.DataFrame, nbr_questions: int, alternatives: "list[str]"
+) -> pd.DataFrame:
+    annotations = pd.DataFrame(columns=["Voter", "Question"] + alternatives)
+    questions = raw_data.iloc[0, 0:nbr_questions].to_numpy()
+    for i in range(len(questions)):
+        for j in range(raw_data.shape[0]):
             col = 0
             for c in range(0, nbr_questions):
-                if Data_brut.iloc[j, c] == Questions[i]:
+                if raw_data.iloc[j, c] == questions[i]:
                     break
                 else:
                     col += 1
-            L = Data_brut.iloc[j, col + 2 * nbr_questions].split("|")
-            row = {"Voter": j, "Question": Questions[i]}
-            for alternative in Alternatives:
+            L = raw_data.iloc[j, col + 2 * nbr_questions].split("|")
+            row = {"Voter": j, "Question": questions[i]}
+            for alternative in alternatives:
                 row[alternative] = int(alternative in L)
-            Annotations = Annotations.append(row, ignore_index=True)
-    Annotations[Alternatives] = Annotations[Alternatives].astype(int)
+            annotations = annotations.append(row, ignore_index=True)
+    annotations[alternatives] = annotations[alternatives].astype(int)
+    return annotations
 
-    return Annotations, GroundTruth
+
+def prepare_data(
+    dataset: Dataset,
+) -> "tuple[pd.DataFrame, pd.DataFrame]":
+    nbr_questions = dataset.nbr_questions
+    alternatives = dataset.alternatives
+
+    raw_data = _read_raw_data(dataset)
+    groundtruth = _get_ground_truth(raw_data, nbr_questions, alternatives)
+    annotations = _get_annotations(raw_data, nbr_questions, alternatives)
+
+    return annotations, groundtruth

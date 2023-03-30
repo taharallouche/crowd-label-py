@@ -1,4 +1,4 @@
-import random
+from random import sample
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,7 +11,7 @@ from size_matters.aggregation_rules import (
     weighted_approval_qw,
 )
 from size_matters.data_preparation import prepare_data
-from size_matters.inventory import DATASETS, Dataset
+from size_matters.inventory import DATASETS, PLOT_OPTIONS, Dataset
 from size_matters.utils import confidence_margin_mean
 
 # Initialize ray for parallel computing
@@ -26,24 +26,22 @@ def compare_methods(n_batch: int, dataset: Dataset) -> None:
     :return: None
     """
 
-    Alternatives = dataset.alternatives
-
-    # Initialize the Annotation and GroundTruth dataframes
-    Anno, GroundTruth = prepare_data(dataset)
+    alternatives = dataset.alternatives
+    annotations, groundtruth = prepare_data(dataset)
 
     # Set the maximum number of voters
-    n = 100
+    max_voters = 10
 
     # initialize the accuracy array
-    Acc = np.zeros([5, n_batch, n - 1])
-    for num in range(1, n):
+    accuracy = np.zeros([5, n_batch, max_voters - 1])
+    for num in range(1, max_voters):
         print("Number of Voters :", num)
         for batch in range(n_batch):
             print("###### Batch ", batch, " ######")
 
             # Randomly sample num voters
-            voters = random.sample(list(Anno.Voter.unique()), num)
-            Annotations = Anno[Anno["Voter"].isin(voters)]
+            voters = sample(list(annotations["Voter"].unique()), num)
+            annotations_batch = annotations[annotations["Voter"].isin(voters)]
 
             # Apply rules to aggregate the answers in parallel
             (
@@ -54,25 +52,29 @@ def compare_methods(n_batch: int, dataset: Dataset) -> None:
                 weight_qw,
             ) = ray.get(
                 [
-                    simple_approval.remote(Annotations, dataset),
-                    mallows_weight.remote(Annotations, dataset, "Euclid"),
-                    mallows_weight.remote(Annotations, dataset, "Jaccard"),
-                    mallows_weight.remote(Annotations, dataset, "Dice"),
-                    weighted_approval_qw.remote(Annotations, dataset),
+                    simple_approval.remote(annotations_batch, dataset),
+                    mallows_weight.remote(
+                        annotations_batch, dataset, "Euclid"
+                    ),
+                    mallows_weight.remote(
+                        annotations_batch, dataset, "Jaccard"
+                    ),
+                    mallows_weight.remote(annotations_batch, dataset, "Dice"),
+                    weighted_approval_qw.remote(annotations_batch, dataset),
                 ]
             )
 
             # Put results into numpy arrays
-            G = GroundTruth[Alternatives].to_numpy().astype(int)
+            G = groundtruth[alternatives].to_numpy().astype(int)
             Weight_sqrt_ham = (
-                weight_sqrt_ham[Alternatives].to_numpy().astype(int)
+                weight_sqrt_ham[alternatives].to_numpy().astype(int)
             )
             Weight_jaccard = (
-                weight_jaccard[Alternatives].to_numpy().astype(int)
+                weight_jaccard[alternatives].to_numpy().astype(int)
             )
-            Weight_dice = weight_dice[Alternatives].to_numpy().astype(int)
-            Weight_qw = weight_qw[Alternatives].to_numpy().astype(int)
-            Maj = maj[Alternatives].to_numpy().astype(int)
+            Weight_dice = weight_dice[alternatives].to_numpy().astype(int)
+            Weight_qw = weight_qw[alternatives].to_numpy().astype(int)
+            Maj = maj[alternatives].to_numpy().astype(int)
 
             # Compute the accuracy of each method
             methods = (
@@ -83,36 +85,28 @@ def compare_methods(n_batch: int, dataset: Dataset) -> None:
                 Weight_qw,
             )
             for i, method in enumerate(methods):
-                Acc[i, batch, num - 1] = 1 - zero_one_loss(G, method)
+                accuracy[i, batch, num - 1] = 1 - zero_one_loss(G, method)
 
     # Plot the accuracies of the methods when the number of voters grows
     fig = plt.figure()  # noqa
-    Zero_one_margin = np.zeros([5, n - 1, 3])
-    for num in range(1, n):
+    zero_one_margin = np.zeros([5, max_voters - 1, 3])
+    for num in range(1, max_voters):
         for i in range(len(methods)):
-            Zero_one_margin[i, num - 1, :] = confidence_margin_mean(
-                Acc[i, :, num - 1]
+            zero_one_margin[i, num - 1, :] = confidence_margin_mean(
+                accuracy[i, :, num - 1]
             )
 
-    plot_otions = {
-        "SAV": {"linestyle": "solid", "index": 0},
-        "Euclid": {"linestyle": "dashdot", "index": 1},
-        "Jaccard": {"linestyle": "dashed", "index": 2},
-        "Dice": {"linestyle": (0, (3, 5, 1, 5)), "index": 3},
-        "Condorcet": {"linestyle": "dotted", "index": 4},
-    }
-
-    for method, options in plot_otions.items():
+    for method, options in PLOT_OPTIONS.items():
         plt.errorbar(
-            range(1, n),
-            Zero_one_margin[options["index"], :, 0],
+            range(1, max_voters),
+            zero_one_margin[options["index"], :, 0],
             label=method,
             linestyle=options["linestyle"],
         )
         plt.fill_between(
-            range(1, n),
-            Zero_one_margin[options["index"], :, 1],
-            Zero_one_margin[options["index"], :, 2],
+            range(1, max_voters),
+            zero_one_margin[options["index"], :, 1],
+            zero_one_margin[options["index"], :, 2],
             alpha=0.2,
         )
 
