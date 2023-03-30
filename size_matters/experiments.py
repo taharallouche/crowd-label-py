@@ -11,14 +11,14 @@ from size_matters.aggregation_rules import (
     weighted_approval_qw,
 )
 from size_matters.data_preparation import prepare_data
-from size_matters.inventory import DataInfos, data_infos
+from size_matters.inventory import DATASETS, Dataset
 from size_matters.utils import confidence_margin_mean
 
 # Initialize ray for parallel computing
 ray.init()
 
 
-def compare_methods(n_batch: int, dataset_info: DataInfos) -> None:
+def compare_methods(n_batch: int, dataset: Dataset) -> None:
     """
     Plots the averaged accuracy over number of batches.
     :param n_batch: the number of batches of voters for each number of voter.
@@ -26,10 +26,10 @@ def compare_methods(n_batch: int, dataset_info: DataInfos) -> None:
     :return: None
     """
 
-    Alternatives = dataset_info.alternatives
+    Alternatives = dataset.alternatives
 
     # Initialize the Annotation and GroundTruth dataframes
-    Anno, GroundTruth = prepare_data(dataset_info)
+    Anno, GroundTruth = prepare_data(dataset)
 
     # Set the maximum number of voters
     n = 100
@@ -54,13 +54,11 @@ def compare_methods(n_batch: int, dataset_info: DataInfos) -> None:
                 weight_qw,
             ) = ray.get(
                 [
-                    simple_approval.remote(Annotations, dataset_info),
-                    mallows_weight.remote(Annotations, dataset_info, "Euclid"),
-                    mallows_weight.remote(
-                        Annotations, dataset_info, "Jaccard"
-                    ),
-                    mallows_weight.remote(Annotations, dataset_info, "Dice"),
-                    weighted_approval_qw.remote(Annotations, dataset_info),
+                    simple_approval.remote(Annotations, dataset),
+                    mallows_weight.remote(Annotations, dataset, "Euclid"),
+                    mallows_weight.remote(Annotations, dataset, "Jaccard"),
+                    mallows_weight.remote(Annotations, dataset, "Dice"),
+                    weighted_approval_qw.remote(Annotations, dataset),
                 ]
             )
 
@@ -121,12 +119,12 @@ def compare_methods(n_batch: int, dataset_info: DataInfos) -> None:
     plt.legend()
     plt.xlabel("Number of voters")
     plt.ylabel("Accuracy")
-    plt.title(dataset_info.name)
+    plt.title(dataset.name)
     plt.show()
 
 
 if __name__ == "__main__":
     dataset_name = input("Select a dataset [animals|textures|languages]: ")
-    dataset_info = data_infos[dataset_name]
+    dataset = DATASETS[dataset_name]
     n_batch = int(input("Choose the number of batches: "))
-    compare_methods(n_batch, dataset_info)
+    compare_methods(n_batch, dataset)

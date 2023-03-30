@@ -2,13 +2,13 @@ import numpy as np
 import pandas as pd
 import ray
 
-from size_matters.inventory import DataInfos
+from size_matters.inventory import Dataset
 
 
 @ray.remote
 # Select the label with greatest number of approvals
 def simple_approval(
-    Annotations: pd.DataFrame, dataset_info: DataInfos
+    Annotations: pd.DataFrame, dataset: Dataset
 ) -> pd.DataFrame:
     """
     Takes Annotation as input and applies the majority rule.
@@ -17,7 +17,7 @@ def simple_approval(
     :return: agg_majority: dataframe of the aggregated answers
     """
 
-    Alternatives = dataset_info.alternatives
+    Alternatives = dataset.alternatives
 
     # Initializing the aggregation dataframe
     Questions = Annotations.Question.unique()
@@ -45,7 +45,7 @@ def simple_approval(
 @ray.remote
 # Estimate the voter's weight question-wise
 def weighted_approval_qw(
-    Annotations: pd.DataFrame, dataset_info: DataInfos
+    Annotations: pd.DataFrame, dataset: Dataset
 ) -> pd.DataFrame:
     """
     Takes Annotations as input and applies weighted approval rule .
@@ -58,7 +58,7 @@ def weighted_approval_qw(
     :return: agg_weighted: dataframe of the aggregated answers
     """
 
-    Alternatives = dataset_info.alternatives
+    Alternatives = dataset.alternatives
 
     # initialize the aggregation dataframe
     m = len(Alternatives)
@@ -96,7 +96,7 @@ def weighted_approval_qw(
 # Compute the weight of a voter according to a specified mallows noise model
 def mallows_weight(
     Annotations: pd.DataFrame,
-    dataset_info: DataInfos,
+    dataset: Dataset,
     distance: str = "Jaccard",
 ) -> pd.DataFrame:
     """
@@ -109,7 +109,7 @@ def mallows_weight(
     :return: agg_weighted: dataframe of the aggregated answers
     """
 
-    Alternatives = dataset_info.alternatives
+    Alternatives = dataset.alternatives
 
     # Initialize the aggregation dataframe
     Questions = list(Annotations.Question.unique())
