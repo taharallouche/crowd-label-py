@@ -44,3 +44,12 @@ DATASETS = {
     "textures": TEXTURES_DATASET,
     "languages": LANGUAGE_DATASET,
 }
+
+
+PLOT_OPTIONS = {
+    "SAV": {"linestyle": "solid", "index": 0},
+    "Euclid": {"linestyle": "dashdot", "index": 1},
+    "Jaccard": {"linestyle": "dashed", "index": 2},
+    "Dice": {"linestyle": (0, (3, 5, 1, 5)), "index": 3},
+    "Condorcet": {"linestyle": "dotted", "index": 4},
+}
