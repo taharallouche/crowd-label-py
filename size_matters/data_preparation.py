@@ -1,10 +1,10 @@
 import pandas as pd
 
-from size_matters.inventory import DataInfos
+from size_matters.inventory import Dataset
 
 
 def prepare_data(
-    dataset_info: DataInfos,
+    dataset: Dataset,
 ) -> "tuple[pd.DataFrame, pd.DataFrame]":
     """
     returns two dataframes: one containing the ground truths of the instances,
@@ -16,9 +16,9 @@ def prepare_data(
     :return: Annotations and GroundTruths dataframes
     """
 
-    path = dataset_info.path
-    nbr_questions = dataset_info.nbr_questions
-    Alternatives = dataset_info.alternatives
+    path = dataset.path
+    nbr_questions = dataset.nbr_questions
+    Alternatives = dataset.alternatives
 
     # Reading Dataset
     Data_brut = pd.read_csv(
