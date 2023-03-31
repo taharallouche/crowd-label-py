@@ -1,6 +1,6 @@
 import pandas as pd
 
-from size_matters.inventory import Dataset
+from size_matters.inventory import COLUMNS, Dataset
 
 
 def _get_column_names(name: str, nbr_questions: int) -> "list[str]":
@@ -9,9 +9,9 @@ def _get_column_names(name: str, nbr_questions: int) -> "list[str]":
 
 def _get_columns(nbr_questions: int) -> "list[str]":
     columns = (
-        _get_column_names("Question", nbr_questions)
-        + _get_column_names("TrueAnswer", nbr_questions)
-        + _get_column_names("Answer", nbr_questions)
+        _get_column_names(COLUMNS.question, nbr_questions)
+        + _get_column_names(COLUMNS.true_answer, nbr_questions)
+        + _get_column_names(COLUMNS.answer, nbr_questions)
     )
     return columns
 
@@ -25,10 +25,15 @@ def _read_raw_data(dataset: Dataset) -> pd.DataFrame:
         delimiter=",",
         index_col=False,
         header=0,
-        names=["Interface", "Mechanism", *columns, "Comments"],
-        usecols=["Interface", *columns],
+        names=[
+            COLUMNS.interface,
+            COLUMNS.mechanism,
+            *columns,
+            COLUMNS.comments,
+        ],
+        usecols=[COLUMNS.interface, *columns],
     )
-    raw_data = raw_data.loc[raw_data.Interface == "subset", columns]
+    raw_data = raw_data.loc[raw_data[COLUMNS.interface] == "subset", columns]
     return raw_data
 
 
@@ -36,10 +41,10 @@ def _get_ground_truth(
     raw_data: pd.DataFrame, nbr_questions: int, alternatives: "list[str]"
 ) -> pd.DataFrame:
     questions = raw_data.iloc[0, 0:nbr_questions].to_numpy()
-    groundtruth = pd.DataFrame(columns=["Question"] + alternatives)
+    groundtruth = pd.DataFrame(columns=[COLUMNS.question] + alternatives)
     for i in range(len(questions)):
         L = raw_data.iloc[0, i + nbr_questions]
-        row = {"Question": questions[i]}
+        row = {COLUMNS.question: questions[i]}
         for alternative in alternatives:
             row[alternative] = int(alternative == L)
         groundtruth = groundtruth.append(row, ignore_index=True)
@@ -49,7 +54,9 @@ def _get_ground_truth(
 def _get_annotations(
     raw_data: pd.DataFrame, nbr_questions: int, alternatives: "list[str]"
 ) -> pd.DataFrame:
-    annotations = pd.DataFrame(columns=["Voter", "Question"] + alternatives)
+    annotations = pd.DataFrame(
+        columns=[COLUMNS.voter, COLUMNS.question] + alternatives
+    )
     questions = raw_data.iloc[0, 0:nbr_questions].to_numpy()
     for i in range(len(questions)):
         for j in range(raw_data.shape[0]):
@@ -60,7 +67,7 @@ def _get_annotations(
                 else:
                     col += 1
             L = raw_data.iloc[j, col + 2 * nbr_questions].split("|")
-            row = {"Voter": j, "Question": questions[i]}
+            row = {COLUMNS.voter: j, COLUMNS.question: questions[i]}
             for alternative in alternatives:
                 row[alternative] = int(alternative in L)
             annotations = annotations.append(row, ignore_index=True)

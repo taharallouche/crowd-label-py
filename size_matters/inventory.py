@@ -1,12 +1,39 @@
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(frozen=True)
 class Dataset:
     name: str
     path: str
     alternatives: list
     nbr_questions: int
+
+
+@dataclass(frozen=True)
+class _COLUMNS:
+    interface: str = "Interface"
+    mechanism: str = "Mechanism"
+    question: str = "Question"
+    true_answer: str = "TrueAnswer"
+    answer: str = "Answer"
+    comments: str = "Comments"
+    voter: str = "Voter"
+    weight: str = "Weight"
+
+
+@dataclass(frozen=True)
+class _RULES:
+    standard_approval_voting: str = "Standard Approval Voting"
+    euclid: str = "Euclid"
+    jaccard: str = "Jaccard"
+    dice: str = "Dice"
+    condorcet: str = "Condorcet"
+
+
+RULES = _RULES()
+
+
+COLUMNS = _COLUMNS()
 
 
 ANIMALS_DATASET = Dataset(
@@ -47,9 +74,9 @@ DATASETS = {
 
 
 PLOT_OPTIONS = {
-    "SAV": {"linestyle": "solid", "index": 0},
-    "Euclid": {"linestyle": "dashdot", "index": 1},
-    "Jaccard": {"linestyle": "dashed", "index": 2},
-    "Dice": {"linestyle": (0, (3, 5, 1, 5)), "index": 3},
-    "Condorcet": {"linestyle": "dotted", "index": 4},
+    RULES.standard_approval_voting: {"linestyle": "solid", "index": 0},
+    RULES.euclid: {"linestyle": "dashdot", "index": 1},
+    RULES.jaccard: {"linestyle": "dashed", "index": 2},
+    RULES.dice: {"linestyle": (0, (3, 5, 1, 5)), "index": 3},
+    RULES.condorcet: {"linestyle": "dotted", "index": 4},
 }
