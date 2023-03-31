@@ -11,7 +11,13 @@ from size_matters.aggregation_rules import (
     weighted_approval_qw,
 )
 from size_matters.data_preparation import prepare_data
-from size_matters.inventory import DATASETS, PLOT_OPTIONS, Dataset
+from size_matters.inventory import (
+    COLUMNS,
+    DATASETS,
+    PLOT_OPTIONS,
+    RULES,
+    Dataset,
+)
 from size_matters.utils import confidence_margin_mean
 
 # Initialize ray for parallel computing
@@ -40,8 +46,10 @@ def compare_methods(n_batch: int, dataset: Dataset) -> None:
             print("###### Batch ", batch, " ######")
 
             # Randomly sample num voters
-            voters = sample(list(annotations["Voter"].unique()), num)
-            annotations_batch = annotations[annotations["Voter"].isin(voters)]
+            voters = sample(list(annotations[COLUMNS.voter].unique()), num)
+            annotations_batch = annotations[
+                annotations[COLUMNS.voter].isin(voters)
+            ]
 
             # Apply rules to aggregate the answers in parallel
             (
@@ -54,12 +62,14 @@ def compare_methods(n_batch: int, dataset: Dataset) -> None:
                 [
                     simple_approval.remote(annotations_batch, dataset),
                     mallows_weight.remote(
-                        annotations_batch, dataset, "Euclid"
+                        annotations_batch, dataset, RULES.euclid
                     ),
                     mallows_weight.remote(
-                        annotations_batch, dataset, "Jaccard"
+                        annotations_batch, dataset, RULES.jaccard
                     ),
-                    mallows_weight.remote(annotations_batch, dataset, "Dice"),
+                    mallows_weight.remote(
+                        annotations_batch, dataset, RULES.dice
+                    ),
                     weighted_approval_qw.remote(annotations_batch, dataset),
                 ]
             )
@@ -77,30 +87,30 @@ def compare_methods(n_batch: int, dataset: Dataset) -> None:
             Maj = maj[alternatives].to_numpy().astype(int)
 
             # Compute the accuracy of each method
-            methods = (
+            rules = (
                 Maj,
                 Weight_sqrt_ham,
                 Weight_jaccard,
                 Weight_dice,
                 Weight_qw,
             )
-            for i, method in enumerate(methods):
-                accuracy[i, batch, num - 1] = 1 - zero_one_loss(G, method)
+            for i, rule in enumerate(rules):
+                accuracy[i, batch, num - 1] = 1 - zero_one_loss(G, rule)
 
     # Plot the accuracies of the methods when the number of voters grows
     fig = plt.figure()  # noqa
     zero_one_margin = np.zeros([5, max_voters - 1, 3])
     for num in range(1, max_voters):
-        for i in range(len(methods)):
+        for i in range(len(rules)):
             zero_one_margin[i, num - 1, :] = confidence_margin_mean(
                 accuracy[i, :, num - 1]
             )
 
-    for method, options in PLOT_OPTIONS.items():
+    for rule, options in PLOT_OPTIONS.items():
         plt.errorbar(
             range(1, max_voters),
             zero_one_margin[options["index"], :, 0],
-            label=method,
+            label=rule,
             linestyle=options["linestyle"],
         )
         plt.fill_between(
