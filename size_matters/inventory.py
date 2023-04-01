@@ -7,6 +7,7 @@ class Dataset:
     path: str
     alternatives: list
     nbr_questions: int
+    nbr_voters: int
 
 
 @dataclass(frozen=True)
@@ -41,6 +42,7 @@ ANIMALS_DATASET = Dataset(
     "data/data_animals.csv",
     ["Leopard", "Tiger", "Puma", "Jaguar", "Lion(ess)", "Cheetah"],
     16,
+    110,
 )
 
 TEXTURES_DATASET = Dataset(
@@ -48,6 +50,7 @@ TEXTURES_DATASET = Dataset(
     "data/data_textures.csv",
     ["Gravel", "Grass", "Brick", "Wood", "Sand", "Cloth"],
     16,
+    96,
 )
 
 LANGUAGE_DATASET = Dataset(
@@ -64,6 +67,7 @@ LANGUAGE_DATASET = Dataset(
         "Hindi",
     ],
     25,
+    109,
 )
 
 DATASETS = {
