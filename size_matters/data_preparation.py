@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from size_matters.inventory import COLUMNS, Dataset
@@ -40,14 +41,22 @@ def _read_raw_data(dataset: Dataset) -> pd.DataFrame:
 def _get_ground_truth(
     raw_data: pd.DataFrame, nbr_questions: int, alternatives: "list[str]"
 ) -> pd.DataFrame:
-    questions = raw_data.iloc[0, 0:nbr_questions].to_numpy()
-    groundtruth = pd.DataFrame(columns=[COLUMNS.question] + alternatives)
-    for i in range(len(questions)):
-        L = raw_data.iloc[0, i + nbr_questions]
-        row = {COLUMNS.question: questions[i]}
-        for alternative in alternatives:
-            row[alternative] = int(alternative == L)
-        groundtruth = groundtruth.append(row, ignore_index=True)
+    questions = raw_data.iloc[0][
+        _get_column_names(COLUMNS.question, nbr_questions)
+    ].to_numpy()
+
+    true_answers = raw_data.iloc[0][
+        _get_column_names(COLUMNS.true_answer, nbr_questions)
+    ].to_numpy()
+
+    groundtruth_matrix = np.equal.outer(alternatives, true_answers).astype(int)
+
+    groundtruth_data = np.concatenate(
+        [questions.reshape(-1, 1), groundtruth_matrix.T], axis=1
+    )
+    groundtruth = pd.DataFrame(
+        groundtruth_data, columns=[COLUMNS.question] + alternatives
+    )
     return groundtruth
 
 
