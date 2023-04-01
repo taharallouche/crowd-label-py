@@ -24,7 +24,7 @@ from size_matters.utils import confidence_margin_mean
 ray.init()
 
 
-def compare_methods(n_batch: int, dataset: Dataset) -> None:
+def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> None:
     """
     Plots the averaged accuracy over number of batches.
     :param n_batch: the number of batches of voters for each number of voter.
@@ -36,7 +36,7 @@ def compare_methods(n_batch: int, dataset: Dataset) -> None:
     annotations, groundtruth = prepare_data(dataset)
 
     # Set the maximum number of voters
-    max_voters = 10
+    max_voters = max_voters
 
     # initialize the accuracy array
     accuracy = np.zeros([5, n_batch, max_voters - 1])
@@ -130,5 +130,11 @@ def compare_methods(n_batch: int, dataset: Dataset) -> None:
 if __name__ == "__main__":
     dataset_name = input("Select a dataset [animals|textures|languages]: ")
     dataset = DATASETS[dataset_name]
+    max_voters = int(
+        input(
+            f"Choose the maximum number of voters, max={dataset.nbr_voters}:"
+        )
+    )
+    assert max_voters <= dataset.nbr_voters, "Too many voters"
     n_batch = int(input("Choose the number of batches: "))
-    compare_methods(n_batch, dataset)
+    compare_methods(dataset=dataset, max_voters=max_voters, n_batch=n_batch)
