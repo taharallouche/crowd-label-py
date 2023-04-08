@@ -20,9 +20,6 @@ from size_matters.inventory import (
 )
 from size_matters.utils import confidence_margin_mean
 
-# Initialize ray for parallel computing
-ray.init()
-
 
 def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> None:
     """
@@ -97,14 +94,15 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> None:
             for i, rule in enumerate(rules):
                 accuracy[i, batch, num - 1] = 1 - zero_one_loss(G, rule)
 
-    # Plot the accuracies of the methods when the number of voters grows
-    fig = plt.figure()  # noqa
-    zero_one_margin = np.zeros([5, max_voters - 1, 3])
+    zero_one_margin = np.zeros([len(rules), max_voters - 1, 3])
     for num in range(1, max_voters):
         for i in range(len(rules)):
             zero_one_margin[i, num - 1, :] = confidence_margin_mean(
                 accuracy[i, :, num - 1]
             )
+
+    # Plot the accuracies of the methods when the number of voters grows
+    fig = plt.figure()  # noqa
 
     for rule, options in PLOT_OPTIONS.items():
         plt.errorbar(
@@ -126,8 +124,11 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> None:
     plt.title(dataset.name)
     plt.show()
 
+    return zero_one_margin
 
-if __name__ == "__main__":
+
+if __name__ == "__main__":  # pragma: no cover
+    ray.init()
     dataset_name = input("Select a dataset [animals|textures|languages]: ")
     dataset = DATASETS[dataset_name]
     max_voters = int(
