@@ -6,40 +6,31 @@ from size_matters.inventory import COLUMNS, RULES, Dataset
 
 
 @ray.remote
-# Select the label with greatest number of approvals
-def simple_approval(
+def standard_approval_voting(
     Annotations: pd.DataFrame, dataset: Dataset
 ) -> pd.DataFrame:
     """
-    Takes Annotation as input and applies the majority rule.
-    :param Annotations: dataframe of the answers of voters as binary vectors
-    :param data: name of the dataset
-    :return: agg_majority: dataframe of the aggregated answers
+    Standard approval voting returns the label that is approved by
+    biggest number of voters for each question
     """
 
     Alternatives = dataset.alternatives
 
-    # Initializing the aggregation dataframe
-    Questions = Annotations.Question.unique()
-    agg_majority = pd.DataFrame(columns=[COLUMNS.question] + Alternatives)
+    approvals_per_question = Annotations.groupby(COLUMNS.question, sort=False)[
+        Alternatives
+    ].sum()
 
-    # Applying majority rule for each question
-    for i in range(len(Questions)):
-        # get the alternative with maximum approvals
-        k = (
-            Annotations.loc[
-                Annotations[COLUMNS.question] == Questions[i], Alternatives
-            ]
-            .sum()
-            .idxmax()
-        )
+    winning_alternatives = pd.Categorical(
+        approvals_per_question.idxmax(axis=1),
+        categories=Alternatives,
+        ordered=True,
+    )
 
-        # add the result to the aggregation dataframe
-        agg_majority.loc[i] = [Questions[i]] + [
-            alternative == k for alternative in Alternatives
-        ]
+    standard_approval_output = pd.get_dummies(
+        winning_alternatives, columns=Alternatives
+    )
 
-    return agg_majority
+    return standard_approval_output
 
 
 @ray.remote

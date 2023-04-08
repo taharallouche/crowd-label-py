@@ -7,7 +7,7 @@ from sklearn.metrics import zero_one_loss
 
 from size_matters.aggregation_rules import (
     mallows_weight,
-    simple_approval,
+    standard_approval_voting,
     weighted_approval_qw,
 )
 from size_matters.data_preparation import prepare_data
@@ -50,14 +50,16 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> None:
 
             # Apply rules to aggregate the answers in parallel
             (
-                maj,
+                standard_approval,
                 weight_sqrt_ham,
                 weight_jaccard,
                 weight_dice,
                 weight_qw,
             ) = ray.get(
                 [
-                    simple_approval.remote(annotations_batch, dataset),
+                    standard_approval_voting.remote(
+                        annotations_batch, dataset
+                    ),
                     mallows_weight.remote(
                         annotations_batch, dataset, RULES.euclid
                     ),
@@ -81,11 +83,13 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> None:
             )
             Weight_dice = weight_dice[alternatives].to_numpy().astype(int)
             Weight_qw = weight_qw[alternatives].to_numpy().astype(int)
-            Maj = maj[alternatives].to_numpy().astype(int)
+            standard_approval = (
+                standard_approval[alternatives].to_numpy().astype(int)
+            )
 
             # Compute the accuracy of each method
             rules = (
-                Maj,
+                standard_approval,
                 Weight_sqrt_ham,
                 Weight_jaccard,
                 Weight_dice,
