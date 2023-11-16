@@ -3,6 +3,7 @@ from random import sample
 import matplotlib.pyplot as plt
 import numpy as np
 import ray
+from tqdm import tqdm
 from sklearn.metrics import zero_one_loss
 
 from size_matters.aggregation_rules import (
@@ -37,16 +38,14 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> None:
 
     # initialize the accuracy array
     accuracy = np.zeros([5, n_batch, max_voters - 1])
-    for num in range(1, max_voters):
-        print("Number of Voters :", num)
-        for batch in range(n_batch):
-            print("###### Batch ", batch, " ######")
-
+    for num in tqdm(
+        range(1, max_voters), desc="Number of voters", position=0, leave=True
+    ):
+        for batch in tqdm(range(n_batch), desc="Batch", position=1, leave=False):
             # Randomly sample num voters
+
             voters = sample(list(annotations[COLUMNS.voter].unique()), num)
-            annotations_batch = annotations[
-                annotations[COLUMNS.voter].isin(voters)
-            ]
+            annotations_batch = annotations[annotations[COLUMNS.voter].isin(voters)]
 
             # Apply rules to aggregate the answers in parallel
             (
@@ -57,35 +56,21 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> None:
                 weight_qw,
             ) = ray.get(
                 [
-                    standard_approval_voting.remote(
-                        annotations_batch, dataset
-                    ),
-                    mallows_weight.remote(
-                        annotations_batch, dataset, RULES.euclid
-                    ),
-                    mallows_weight.remote(
-                        annotations_batch, dataset, RULES.jaccard
-                    ),
-                    mallows_weight.remote(
-                        annotations_batch, dataset, RULES.dice
-                    ),
+                    standard_approval_voting.remote(annotations_batch, dataset),
+                    mallows_weight.remote(annotations_batch, dataset, RULES.euclid),
+                    mallows_weight.remote(annotations_batch, dataset, RULES.jaccard),
+                    mallows_weight.remote(annotations_batch, dataset, RULES.dice),
                     weighted_approval_qw.remote(annotations_batch, dataset),
                 ]
             )
 
             # Put results into numpy arrays
             G = groundtruth[alternatives].to_numpy().astype(int)
-            Weight_sqrt_ham = (
-                weight_sqrt_ham[alternatives].to_numpy().astype(int)
-            )
-            Weight_jaccard = (
-                weight_jaccard[alternatives].to_numpy().astype(int)
-            )
+            Weight_sqrt_ham = weight_sqrt_ham[alternatives].to_numpy().astype(int)
+            Weight_jaccard = weight_jaccard[alternatives].to_numpy().astype(int)
             Weight_dice = weight_dice[alternatives].to_numpy().astype(int)
             Weight_qw = weight_qw[alternatives].to_numpy().astype(int)
-            standard_approval = (
-                standard_approval[alternatives].to_numpy().astype(int)
-            )
+            standard_approval = standard_approval[alternatives].to_numpy().astype(int)
 
             # Compute the accuracy of each method
             rules = (
@@ -136,9 +121,7 @@ if __name__ == "__main__":  # pragma: no cover
     dataset_name = input("Select a dataset [animals|textures|languages]: ")
     dataset = DATASETS[dataset_name]
     max_voters = int(
-        input(
-            f"Choose the maximum number of voters, max={dataset.nbr_voters}:"
-        )
+        input(f"Choose the maximum number of voters, max={dataset.nbr_voters}:")
     )
     assert max_voters <= dataset.nbr_voters, "Too many voters"
     n_batch = int(input("Choose the number of batches: "))
