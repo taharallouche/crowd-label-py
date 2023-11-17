@@ -48,17 +48,19 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint/flake8: ## check style with flake8
-	flake8 size_matters tests --count
+	flake8 size_matters tests --count --max-complexity=7 --max-line-length=88 --statistics
 
 lint/black: ## check style with black
-	black --check size_matters tests
+	black --check size_matters tests --line-length=88
 
-lint: lint/flake8 lint/black ## check style
-	python -m mypy size_matters
+typing-py: ## check typing
+	mypy size_matters --follow-imports=skip --ignore-missing-imports
+
+lint: lint/flake8 lint/black typing-py
+	
 
 test:  ## run tests quickly with the default Python
-	@git fetch --all
-	pytest -vvv --cov=./ --cov-report=xml
+	pytest -vvv
 
 test-all: ## run tests on every Python version with tox
 	tox
@@ -95,8 +97,7 @@ install: clean ## install the package to the active Python's site-packages
 
 install-dev: clean ## install the package to the active Python's site-packages
 	pip install -r requirements.txt
-	python setup.py install
-	make prepare-dvc-test-remote
+	python setup.py develop
 
 test-release: dist ## test package and upload a release
 	twine upload --repository testpypi --config-file ../.pypirc dist/*
