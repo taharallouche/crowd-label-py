@@ -63,9 +63,7 @@ def _get_ground_truth(
 def _get_annotations(
     raw_data: pd.DataFrame, nbr_questions: int, alternatives: "list[str]"
 ) -> pd.DataFrame:
-    annotations = pd.DataFrame(
-        columns=[COLUMNS.voter, COLUMNS.question] + alternatives
-    )
+    annotations = pd.DataFrame(columns=[COLUMNS.voter, COLUMNS.question] + alternatives)
     questions = raw_data.iloc[0, 0:nbr_questions].to_numpy()
     for i in range(len(questions)):
         for j in range(raw_data.shape[0]):

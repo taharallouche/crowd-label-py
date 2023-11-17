@@ -35,9 +35,7 @@ def standard_approval_voting(
 
 @ray.remote
 # Estimate the voter's weight question-wise
-def weighted_approval_qw(
-    Annotations: pd.DataFrame, dataset: Dataset
-) -> pd.DataFrame:
+def weighted_approval_qw(Annotations: pd.DataFrame, dataset: Dataset) -> pd.DataFrame:
     """
     Takes Annotations as input and applies weighted approval rule .
     The weights are determined question-wise by estimating the reliabilities.

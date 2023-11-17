@@ -3,8 +3,8 @@ from random import sample
 import matplotlib.pyplot as plt
 import numpy as np
 import ray
-from tqdm import tqdm
 from sklearn.metrics import zero_one_loss
+from tqdm import tqdm
 
 from size_matters.aggregation_rules import (
     mallows_weight,
@@ -12,13 +12,7 @@ from size_matters.aggregation_rules import (
     weighted_approval_qw,
 )
 from size_matters.data_preparation import prepare_data
-from size_matters.inventory import (
-    COLUMNS,
-    DATASETS,
-    PLOT_OPTIONS,
-    RULES,
-    Dataset,
-)
+from size_matters.inventory import COLUMNS, DATASETS, PLOT_OPTIONS, RULES, Dataset
 from size_matters.utils import confidence_margin_mean
 
 
