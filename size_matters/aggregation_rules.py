@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import ray
 
-from size_matters.inventory import COLUMNS, RULES, Dataset
+from size_matters.inventory import COLUMNS, RELIABILITY_BOUNDS, RULES, Dataset
 
 
 @ray.remote
@@ -34,7 +34,6 @@ def standard_approval_voting(
 
 
 @ray.remote
-# Estimate the voter's weight question-wise
 def weighted_approval_qw(Annotations: pd.DataFrame, dataset: Dataset) -> pd.DataFrame:
     """
     Takes Annotations as input and applies weighted approval rule .
@@ -66,7 +65,7 @@ def weighted_approval_qw(Annotations: pd.DataFrame, dataset: Dataset) -> pd.Data
 
         # The estimated reliability of each voter in this question
         p = (m - 1 - s) / (m - 2)
-        p = np.clip(p, 0.001, 0.999)
+        p = np.clip(p, RELIABILITY_BOUNDS.lower, RELIABILITY_BOUNDS.upper)
         p = p.astype(float)
 
         # The weight of each voter in this question
@@ -84,7 +83,6 @@ def weighted_approval_qw(Annotations: pd.DataFrame, dataset: Dataset) -> pd.Data
 
 
 @ray.remote
-# Compute the weight of a voter according to a specified mallows noise model
 def mallows_weight(
     Annotations: pd.DataFrame,
     dataset: Dataset,

@@ -4,11 +4,11 @@ import pandas as pd
 from size_matters.inventory import COLUMNS, Dataset
 
 
-def _get_column_names(name: str, nbr_questions: int) -> "list[str]":
+def _get_column_names(name: str, nbr_questions: int) -> list[str]:
     return [f"{name}{i}" for i in range(nbr_questions)]
 
 
-def _get_columns(nbr_questions: int) -> "list[str]":
+def _get_columns(nbr_questions: int) -> list[str]:
     columns = (
         _get_column_names(COLUMNS.question, nbr_questions)
         + _get_column_names(COLUMNS.true_answer, nbr_questions)
@@ -39,7 +39,7 @@ def _read_raw_data(dataset: Dataset) -> pd.DataFrame:
 
 
 def _get_ground_truth(
-    raw_data: pd.DataFrame, nbr_questions: int, alternatives: "list[str]"
+    raw_data: pd.DataFrame, nbr_questions: int, alternatives: list[str]
 ) -> pd.DataFrame:
     questions = raw_data.iloc[0][
         _get_column_names(COLUMNS.question, nbr_questions)
@@ -61,7 +61,7 @@ def _get_ground_truth(
 
 
 def _get_annotations(
-    raw_data: pd.DataFrame, nbr_questions: int, alternatives: "list[str]"
+    raw_data: pd.DataFrame, nbr_questions: int, alternatives: list[str]
 ) -> pd.DataFrame:
     annotations = pd.DataFrame(columns=[COLUMNS.voter, COLUMNS.question] + alternatives)
     questions = raw_data.iloc[0, 0:nbr_questions].to_numpy()
@@ -82,9 +82,7 @@ def _get_annotations(
     return annotations
 
 
-def prepare_data(
-    dataset: Dataset,
-) -> "tuple[pd.DataFrame, pd.DataFrame]":
+def prepare_data(dataset: Dataset) -> tuple[pd.DataFrame, pd.DataFrame]:
     nbr_questions = dataset.nbr_questions
     alternatives = dataset.alternatives
 
