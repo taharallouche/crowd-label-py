@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import ray
 
-from size_matters.inventory import COLUMNS, RELIABILITY_BOUNDS, RULES, Dataset
+from size_matters.utils.inventory import COLUMNS, RELIABILITY_BOUNDS, RULES, Dataset
 
 
 @ray.remote

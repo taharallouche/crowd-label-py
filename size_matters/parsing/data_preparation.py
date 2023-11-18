@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from size_matters.inventory import COLUMNS, Dataset
+from size_matters.utils.inventory import COLUMNS, Dataset
 
 
 def _get_column_names(name: str, nbr_questions: int) -> list[str]:

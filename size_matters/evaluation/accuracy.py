@@ -7,14 +7,14 @@ from numpy.typing import NDArray
 from sklearn.metrics import zero_one_loss
 from tqdm import tqdm
 
-from size_matters.aggregation_rules import (
+from size_matters.aggregation.aggregators import (
     mallows_weight,
     standard_approval_voting,
     weighted_approval_qw,
 )
-from size_matters.data_preparation import prepare_data
-from size_matters.inventory import COLUMNS, PLOT_OPTIONS, RULES, Dataset
-from size_matters.utils import confidence_margin_mean
+from size_matters.parsing.data_preparation import prepare_data
+from size_matters.utils.inventory import COLUMNS, PLOT_OPTIONS, RULES, Dataset
+from size_matters.utils.utils import confidence_margin_mean
 
 
 def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:

@@ -4,16 +4,16 @@ import numpy as np
 import pytest
 
 
-@pytest.mark.ut
-@patch("size_matters.experiments.plt")
+@pytest.mark.e2e
+@patch("size_matters.evaluation.accuracy.plt")
 def test_compare_methods(mock_plt: MagicMock) -> None:
     # Given
     import random
 
     import ray
 
-    from size_matters.experiments import compare_methods
-    from size_matters.inventory import DATASETS
+    from size_matters.evaluation.accuracy import compare_methods
+    from size_matters.utils.inventory import DATASETS
 
     ray.init()
 

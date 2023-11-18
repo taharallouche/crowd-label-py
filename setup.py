@@ -13,7 +13,7 @@ setup(
     author="Tahar Allouche",
     author_email="tahar.allouche@dauphine.eu",
     license="BSD 2-clause",
-    packages=find_packages("size_matters", "tests"),
+    packages=find_packages(),
     install_requires=[
         "numpy>=1.24.1",
         "scipy>=1.10.0",

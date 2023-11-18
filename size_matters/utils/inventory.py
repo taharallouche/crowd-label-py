@@ -48,7 +48,7 @@ COLUMNS = _COLUMNS()
 
 ANIMALS_DATASET = Dataset(
     "animals",
-    "data/data_animals.csv",
+    "data/animals/raw.csv",
     ["Leopard", "Tiger", "Puma", "Jaguar", "Lion(ess)", "Cheetah"],
     16,
     110,
@@ -56,7 +56,7 @@ ANIMALS_DATASET = Dataset(
 
 TEXTURES_DATASET = Dataset(
     "textures",
-    "data/data_textures.csv",
+    "data/textures/raw.csv",
     ["Gravel", "Grass", "Brick", "Wood", "Sand", "Cloth"],
     16,
     96,
@@ -64,7 +64,7 @@ TEXTURES_DATASET = Dataset(
 
 LANGUAGE_DATASET = Dataset(
     "languages",
-    "data/data_languages.csv",
+    "data/languages/raw.csv",
     [
         "Hebrew",
         "Russian",
