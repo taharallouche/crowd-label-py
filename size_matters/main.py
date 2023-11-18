@@ -1,7 +1,7 @@
 import ray
 
-from size_matters.experiments import compare_methods
-from size_matters.inventory import DATASETS
+from size_matters.evaluation.accuracy import compare_methods
+from size_matters.utils.inventory import DATASETS
 
 if __name__ == "__main__":  # pragma: no cover
     ray.init()
