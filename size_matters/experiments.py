@@ -3,6 +3,7 @@ from random import sample
 import matplotlib.pyplot as plt
 import numpy as np
 import ray
+from numpy.typing import NDArray
 from sklearn.metrics import zero_one_loss
 from tqdm import tqdm
 
@@ -16,12 +17,12 @@ from size_matters.inventory import COLUMNS, DATASETS, PLOT_OPTIONS, RULES, Datas
 from size_matters.utils import confidence_margin_mean
 
 
-def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> None:
+def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:
     """
     Plots the averaged accuracy over number of batches.
     :param n_batch: the number of batches of voters for each number of voter.
     :param data: name of the dataset
-    :return: None
+    :return: zero_one_margin: the accuracy of each method
     """
 
     alternatives = dataset.alternatives

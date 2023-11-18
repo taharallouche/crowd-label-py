@@ -31,6 +31,15 @@ class _RULES:
     condorcet: str = "Condorcet"
 
 
+@dataclass(frozen=True)
+class _RELIABILITY_BOUNDS:
+    lower: float = 10**-3
+    upper: float = 1 - 10**-3
+
+
+RELIABILITY_BOUNDS = _RELIABILITY_BOUNDS()
+
+
 RULES = _RULES()
 
 

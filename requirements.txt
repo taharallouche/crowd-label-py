@@ -26,6 +26,7 @@ kiwisolver==1.4.5
 matplotlib==3.6.3
 mccabe==0.7.0
 msgpack==1.0.7
+mypy==1.7.0
 mypy-extensions==1.0.0
 numpy==1.24.1
 packaging==23.2
