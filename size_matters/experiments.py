@@ -13,7 +13,7 @@ from size_matters.aggregation_rules import (
     weighted_approval_qw,
 )
 from size_matters.data_preparation import prepare_data
-from size_matters.inventory import COLUMNS, DATASETS, PLOT_OPTIONS, RULES, Dataset
+from size_matters.inventory import COLUMNS, PLOT_OPTIONS, RULES, Dataset
 from size_matters.utils import confidence_margin_mean
 
 
@@ -85,8 +85,15 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:
                 accuracy[i, :, num - 1]
             )
 
-    # Plot the accuracies of the methods when the number of voters grows
-    fig = plt.figure()  # noqa
+    _plot_accuracies(dataset, max_voters, zero_one_margin)
+
+    return zero_one_margin
+
+
+def _plot_accuracies(
+    dataset: Dataset, max_voters: int, zero_one_margin: NDArray
+) -> None:
+    fig = plt.figure()  # noqa: unused
 
     for rule, options in PLOT_OPTIONS.items():
         plt.errorbar(
@@ -107,17 +114,3 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:
     plt.ylabel("Accuracy")
     plt.title(dataset.name)
     plt.show()
-
-    return zero_one_margin
-
-
-if __name__ == "__main__":  # pragma: no cover
-    ray.init()
-    dataset_name = input("Select a dataset [animals|textures|languages]: ")
-    dataset = DATASETS[dataset_name]
-    max_voters = int(
-        input(f"Choose the maximum number of voters, max={dataset.nbr_voters}:")
-    )
-    assert max_voters <= dataset.nbr_voters, "Too many voters"
-    n_batch = int(input("Choose the number of batches: "))
-    compare_methods(dataset=dataset, max_voters=max_voters, n_batch=n_batch)
