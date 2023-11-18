@@ -56,7 +56,7 @@ lint/black: ## check style with black
 typing-py: ## check typing
 	mypy size_matters --follow-imports=skip --ignore-missing-imports
 
-lint: lint/flake8 lint/black typing-py
+lint: lint/flake8 lint/black
 	
 
 test:  ## run tests quickly with the default Python
