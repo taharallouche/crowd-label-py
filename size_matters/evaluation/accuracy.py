@@ -1,5 +1,5 @@
 from random import sample
-
+import logging
 import matplotlib.pyplot as plt
 import numpy as np
 import ray
@@ -15,6 +15,10 @@ from size_matters.aggregation.aggregators import (
 from size_matters.parsing.data_preparation import prepare_data
 from size_matters.utils.inventory import COLUMNS, PLOT_OPTIONS, RULES, Dataset
 from size_matters.utils.utils import confidence_margin_mean
+
+logging.basicConfig(
+    level=logging.INFO, format="'%(asctime)s - %(levelname)s - %(message)s'"
+)
 
 
 def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:
@@ -33,6 +37,8 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:
 
     # initialize the accuracy array
     accuracy = np.zeros([5, n_batch, max_voters - 1])
+
+    logging.info("Vote started : running the different methods ")
     for num in tqdm(
         range(1, max_voters), desc="Number of voters", position=0, leave=True
     ):
@@ -77,7 +83,7 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:
             )
             for i, rule in enumerate(rules):
                 accuracy[i, batch, num - 1] = 1 - zero_one_loss(G, rule)
-
+    logging.info("Vote completed")
     zero_one_margin = np.zeros([len(rules), max_voters - 1, 3])
     for num in range(1, max_voters):
         for i in range(len(rules)):
