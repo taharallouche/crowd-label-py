@@ -1,33 +1,26 @@
-# Truth-tracking via Approval Voting: Size Matters!
-## Tahar Allouche, Jérôme Lang, Florian Yger
-### AAAI-2022
+# :globe_with_meridians: :ballot_box: crowd-label-py :ballot_box: :globe_with_meridians:
 
-**Paper Abstract ([paper available here](https://arxiv.org/pdf/2112.04387.pdf)):**\
-Epistemic social choice aims at unveiling a hidden ground
-truth given votes, which are interpreted as noisy signals about
-it. We consider here a simple setting where votes consist
-of approval ballots: each voter approves a set of alternatives which they believe can possibly be the ground truth.
-Based on the intuitive idea that more reliable votes contain
-fewer alternatives, we define several noise models that are approval voting variants of the Mallows model. The likelihood maximizing alternative is then characterized as the winner of
-a weighted approval rule, where the weight of a ballot decreases with its cardinality. We have conducted an experiment
-on three image annotation datasets; they conclude that rules
-based on our noise model outperform standard approval voting; the best performance is obtained by a variant of the Condorcet noise model.
+This python package serves two purposes:
+1. Ensures the reporucibility of my [AAAI-2022 paper](https://ojs.aaai.org/index.php/AAAI/article/view/20403)'s experiments, introducing the **vote-size-matters** crowdsourcing data labelling method. 📚🧪📊
+2. Enable you to apply the data labelling method to your own datasets.🛠️🗃️
 
 
-**Repository:**\
-This repository contains the python code and datasets used in the Experiments section in the paper. 
+## The vote-size-matters collective labelling method
+If you possess an unlabeled dataset comprising 📷 images, 🔊 sounds, 🎥 videos, or ✉️ texts, and you have collected some crowdsourced annotations with the aim of aggregating them optimally to deduce the correct label for each instance, then crowd-label-py is the solution you're seeking! 🚀 
 
-**Datasets:**\
-The data that we used was originally collected in:
->Shah, Nihar, Dengyong Zhou, and Yuval Peres. "Approval voting and incentives in crowdsourcing." International conference on machine learning. PMLR, 2015.
+The package implements the size-matters truth tracking principle, 💡 which has consistently shown superior performance compared to other voter-agnostic aggregation rules :chart_with_upwards_trend:. One notable advantage of this method is its reliance on a simple intuition, making the results it produces entirely explainable! :dart:🌟
 
-The above paper designs mechanisms to incentivize crowdsourcing workers to answer truthfully in approval voting settings.
+In fact, the method's key principles include:
+1. Granting hesitant voters the flexibility to select more than one possible label. 🤔🔄
+2. Relying on mathematically proven [payment schemes](https://proceedings.mlr.press/v37/shaha15.html) to ensure sincerity of voters.📊✅
+3. Assigning greater weight to voters who choose fewer labels. After all, a voter familiar with the correct label would likely choose that option, whereas a voter who selects too many labels probably doesn't know the correct answer.⚖️
 
-**Code:**\
-Here we succintly present the main function in the [python file](experiments.py):
-- `compare_methods(n_batch, data)`: This function compare the accuracy of different aggregation methods across the chosen dataset for different number of voters.
-It samples *n_batch* batches for each number of voters, and average the precision over them.
+Various weighting schemes are provided to the user, with each one being optimal under different assumptions. The choice of the right scheme is yours to make!
 
-To run the experiments, run the command:\
-`python3 src/experiments.py`\
-You will be asked to select the *dataset* (animals, textures or languages) and the *number of batches*.
+## First guide: How to reproduce the paper's results
+After cloning the repo, you should:
+1. `make install-dev`: this will install all the requirements (via `pip`) and setup the package on develop mode.
+2. `python3 size_matters/main.py`: this will execute the python script for comparing the aggregation rules and showing the results. You will be asked to enter your preferences, like choosing the dataset, the number of voters and the number of simulations.
+
+## Second guide: How to use crowd-label-py to process your data
+Coming Soon .. 📆
