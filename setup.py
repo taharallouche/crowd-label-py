@@ -20,7 +20,7 @@ setup(
         "pandas>=1.4.1",
         "matplotlib>=3.6.3",
         "scikit-learn>=1.2.1",
-        "ray>=2.2.0",
+        "ray>=2.8.0",
         "tornado>=6.2",
     ],
     test_suite="tests",

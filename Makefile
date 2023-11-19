@@ -62,8 +62,7 @@ lint: lint/flake8 lint/black
 test:  ## run tests quickly with the default Python
 	pytest -vvv
 
-test-all: ## run tests on every Python version with tox
-	tox
+test-all: lint test
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source size_matters -m pytest
