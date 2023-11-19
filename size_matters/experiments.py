@@ -3,9 +3,12 @@ from random import sample
 import matplotlib.pyplot as plt
 import numpy as np
 import ray
+import logging
 from numpy.typing import NDArray
 from sklearn.metrics import zero_one_loss
 from tqdm import tqdm
+
+import ray
 
 from size_matters.aggregation_rules import (
     mallows_weight,
@@ -33,6 +36,10 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:
 
     # initialize the accuracy array
     accuracy = np.zeros([5, n_batch, max_voters - 1])
+    logging.basicConfig(
+        level=logging.INFO, format="'%(asctime)s - %(levelname)s - %(message)s'"
+    )
+    logging.info("Vote started : running the different methods ")
     for num in tqdm(
         range(1, max_voters), desc="Number of voters", position=0, leave=True
     ):
@@ -77,7 +84,7 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:
             )
             for i, rule in enumerate(rules):
                 accuracy[i, batch, num - 1] = 1 - zero_one_loss(G, rule)
-
+    logging.info("Vote completed")
     zero_one_margin = np.zeros([len(rules), max_voters - 1, 3])
     for num in range(1, max_voters):
         for i in range(len(rules)):
