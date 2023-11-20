@@ -6,7 +6,7 @@ from size_matters.utils.inventory import COLUMNS, RELIABILITY_BOUNDS, RULES, Dat
 
 
 @ray.remote
-def standard_approval_voting(
+def apply_standard_approval_aggregator(
     Annotations: pd.DataFrame, dataset: Dataset
 ) -> pd.DataFrame:
     """
@@ -34,56 +34,42 @@ def standard_approval_voting(
 
 
 @ray.remote
-def weighted_approval_qw(Annotations: pd.DataFrame, dataset: Dataset) -> pd.DataFrame:
-    """
-    Takes Annotations as input and applies weighted approval rule .
-    The weights are determined question-wise by estimating the reliabilities.
-    This reliability is estimated from the number of alternatives that the
-    voter selects in each of the questions.
-    :param Annotations: dataframe
-    containing the answers of voters as binary vectors
-    :param data: name of the dataset
-    :return: agg_weighted: dataframe of the aggregated answers
-    """
+def apply_condorcet_aggregator(
+    annotations: pd.DataFrame, dataset: Dataset
+) -> pd.DataFrame:
+    questions = list(annotations[COLUMNS.question].unique())
+    number_of_alternatives = len(dataset.alternatives)
 
-    Alternatives = dataset.alternatives
+    aggregated_labels = pd.DataFrame(columns=[COLUMNS.question] + dataset.alternatives)
 
-    # initialize the aggregation dataframe
-    m = len(Alternatives)
-    Questions = list(Annotations.Question.unique())
-    agg_weighted = pd.DataFrame(columns=[COLUMNS.question] + Alternatives)
+    for i, question in enumerate(questions):
+        question_annotations = annotations[annotations[COLUMNS.question] == question][
+            dataset.alternatives
+        ].to_numpy()
 
-    # weight of each voter and aggregate the answers in each question
-    weights = pd.DataFrame(columns=[COLUMNS.voter, COLUMNS.weight])
-    weights[COLUMNS.voter] = Annotations.Voter.unique()
-    n = len(list(weights[COLUMNS.voter]))
-    D = Annotations.loc[:, Alternatives].to_numpy()
+        vote_size = np.sum(question_annotations, axis=1)
 
-    for i in range(len(Questions)):
-        # The number of alternatives selected by each voter in this question
-        s = np.sum(D[n * i : n * (i + 1), :], axis=1)  # noqa: E203
-
-        # The estimated reliability of each voter in this question
-        p = (m - 1 - s) / (m - 2)
-        p = np.clip(p, RELIABILITY_BOUNDS.lower, RELIABILITY_BOUNDS.upper)
-        p = p.astype(float)
-
-        # The weight of each voter in this question
-        weights[COLUMNS.weight] = np.log(p / (1 - p))
-
-        L = np.matmul(
-            weights[COLUMNS.weight].T, D[n * i : n * (i + 1), :]  # noqa: E203
+        reliabilities = (number_of_alternatives - 1 - vote_size) / (
+            number_of_alternatives - 2
         )
-        k = np.argmax(L)
-        agg_weighted.loc[i] = [Questions[i]] + [
-            t == k for t in range(0, len(Alternatives))
+        reliabilities = np.clip(
+            reliabilities, RELIABILITY_BOUNDS.lower, RELIABILITY_BOUNDS.upper
+        )
+
+        weights = np.log(reliabilities / (1 - reliabilities))
+
+        weighted_scores = np.matmul(weights.T, question_annotations)
+        most_likely_label = np.argmax(weighted_scores)
+
+        aggregated_labels.loc[i] = [question] + [
+            label == most_likely_label for label in range(number_of_alternatives)
         ]
 
-    return agg_weighted
+    return aggregated_labels
 
 
 @ray.remote
-def mallows_weight(
+def apply_mallow_aggregator(
     Annotations: pd.DataFrame,
     dataset: Dataset,
     distance: str = RULES.jaccard,
