@@ -8,9 +8,9 @@ from sklearn.metrics import zero_one_loss
 from tqdm import tqdm
 
 from size_matters.aggregation.aggregators import (
-    mallows_weight,
-    standard_approval_voting,
-    weighted_approval_qw,
+    apply_condorcet_aggregator,
+    apply_mallow_aggregator,
+    apply_standard_approval_aggregator,
 )
 from size_matters.parsing.data_preparation import prepare_data
 from size_matters.utils.inventory import COLUMNS, PLOT_OPTIONS, RULES, Dataset
@@ -57,11 +57,19 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:
                 weight_qw,
             ) = ray.get(
                 [
-                    standard_approval_voting.remote(annotations_batch, dataset),
-                    mallows_weight.remote(annotations_batch, dataset, RULES.euclid),
-                    mallows_weight.remote(annotations_batch, dataset, RULES.jaccard),
-                    mallows_weight.remote(annotations_batch, dataset, RULES.dice),
-                    weighted_approval_qw.remote(annotations_batch, dataset),
+                    apply_standard_approval_aggregator.remote(
+                        annotations_batch, dataset
+                    ),
+                    apply_mallow_aggregator.remote(
+                        annotations_batch, dataset, RULES.euclid
+                    ),
+                    apply_mallow_aggregator.remote(
+                        annotations_batch, dataset, RULES.jaccard
+                    ),
+                    apply_mallow_aggregator.remote(
+                        annotations_batch, dataset, RULES.dice
+                    ),
+                    apply_condorcet_aggregator.remote(annotations_batch, dataset),
                 ]
             )
 
