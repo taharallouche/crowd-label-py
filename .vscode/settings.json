@@ -1,5 +1,4 @@
 {
-    "window.zoomLevel": 1,
     "python.testing.pytestArgs": [
         "tests"
     ],
