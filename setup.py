@@ -9,11 +9,11 @@ setup(
     name="size_matters",
     version="0.1.0",
     description=description,
-    url="https://github.com/taharallouche/Truth_Tracking-via-AV",
+    url="https://github.com/taharallouche/crowd-label-py",
     author="Tahar Allouche",
     author_email="tahar.allouche@dauphine.eu",
     license="BSD 2-clause",
-    packages=find_packages(),
+    packages=find_packages(include=["size_matters", "size_matters.*"]),
     install_requires=[
         "numpy>=1.24.1",
         "scipy>=1.10.0",
@@ -27,6 +27,6 @@ setup(
     classifiers=[
         "Development Status :: 1 - Planning",
         "Intended Audience :: Science/Research",
-        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.11",
     ],
 )
