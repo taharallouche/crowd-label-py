@@ -58,15 +58,9 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:
             ) = ray.get(
                 [
                     apply_standard_approval_aggregator.remote(annotations_batch),
-                    apply_mallow_aggregator.remote(
-                        annotations_batch, dataset, RULES.euclid
-                    ),
-                    apply_mallow_aggregator.remote(
-                        annotations_batch, dataset, RULES.jaccard
-                    ),
-                    apply_mallow_aggregator.remote(
-                        annotations_batch, dataset, RULES.dice
-                    ),
+                    apply_mallow_aggregator.remote(annotations_batch, RULES.euclid),
+                    apply_mallow_aggregator.remote(annotations_batch, RULES.jaccard),
+                    apply_mallow_aggregator.remote(annotations_batch, RULES.dice),
                     apply_condorcet_aggregator.remote(annotations_batch),
                 ]
             )
