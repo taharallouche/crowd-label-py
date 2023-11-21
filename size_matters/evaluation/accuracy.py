@@ -69,7 +69,7 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:
                     apply_mallow_aggregator.remote(
                         annotations_batch, dataset, RULES.dice
                     ),
-                    apply_condorcet_aggregator.remote(annotations_batch, dataset),
+                    apply_condorcet_aggregator.remote(annotations_batch),
                 ]
             )
 

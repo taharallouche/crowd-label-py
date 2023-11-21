@@ -34,17 +34,20 @@ def apply_standard_approval_aggregator(
 
 
 @ray.remote
-def apply_condorcet_aggregator(
-    annotations: pd.DataFrame, dataset: Dataset
-) -> pd.DataFrame:
+def apply_condorcet_aggregator(annotations: pd.DataFrame) -> pd.DataFrame:
+    alternatives = [
+        column
+        for column in annotations.columns
+        if column != COLUMNS.question and column != COLUMNS.voter
+    ]
     questions = list(annotations[COLUMNS.question].unique())
-    number_of_alternatives = len(dataset.alternatives)
+    number_of_alternatives = len(alternatives)
 
-    aggregated_labels = pd.DataFrame(columns=[COLUMNS.question] + dataset.alternatives)
+    aggregated_labels = pd.DataFrame(columns=[COLUMNS.question] + alternatives)
 
     for i, question in enumerate(questions):
         question_annotations = annotations[annotations[COLUMNS.question] == question][
-            dataset.alternatives
+            alternatives
         ].to_numpy()
 
         vote_size = np.sum(question_annotations, axis=1)
