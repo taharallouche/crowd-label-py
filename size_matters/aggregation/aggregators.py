@@ -6,28 +6,25 @@ from size_matters.utils.inventory import COLUMNS, RELIABILITY_BOUNDS, RULES, Dat
 
 
 @ray.remote
-def apply_standard_approval_aggregator(
-    Annotations: pd.DataFrame, dataset: Dataset
-) -> pd.DataFrame:
-    """
-    Standard approval voting returns the label that is approved by
-    biggest number of voters for each question
-    """
+def apply_standard_approval_aggregator(annotations: pd.DataFrame) -> pd.DataFrame:
+    alternatives = [
+        column
+        for column in annotations.columns
+        if column != COLUMNS.question and column != COLUMNS.voter
+    ]
 
-    Alternatives = dataset.alternatives
-
-    approvals_per_question = Annotations.groupby(COLUMNS.question, sort=False)[
-        Alternatives
+    approvals_per_question = annotations.groupby(COLUMNS.question, sort=False)[
+        alternatives
     ].sum()
 
     winning_alternatives = pd.Categorical(
         approvals_per_question.idxmax(axis=1),
-        categories=Alternatives,
+        categories=alternatives,
         ordered=True,
     )
 
     standard_approval_output = pd.get_dummies(
-        winning_alternatives, columns=Alternatives
+        winning_alternatives, columns=alternatives
     )
 
     return standard_approval_output
