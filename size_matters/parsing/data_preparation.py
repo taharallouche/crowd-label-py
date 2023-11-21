@@ -56,7 +56,7 @@ def _get_ground_truth(
     )
     groundtruth = pd.DataFrame(
         groundtruth_data, columns=[COLUMNS.question] + alternatives
-    )
+    ).set_index([COLUMNS.question])
     return groundtruth
 
 
@@ -79,7 +79,7 @@ def _get_annotations(
                 row[alternative] = int(alternative in L)
             annotations = annotations.append(row, ignore_index=True)
     annotations[alternatives] = annotations[alternatives].astype(int)
-    return annotations
+    return annotations.set_index([COLUMNS.question, COLUMNS.voter])
 
 
 def prepare_data(dataset: Dataset) -> tuple[pd.DataFrame, pd.DataFrame]:

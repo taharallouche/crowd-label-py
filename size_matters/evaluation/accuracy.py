@@ -22,39 +22,29 @@ logging.basicConfig(
 
 
 def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:
-    """
-    Plots the averaged accuracy over number of batches.
-    :param n_batch: the number of batches of voters for each number of voter.
-    :param data: name of the dataset
-    :return: zero_one_margin: the accuracy of each method
-    """
-
-    alternatives = dataset.alternatives
     annotations, groundtruth = prepare_data(dataset)
 
-    # Set the maximum number of voters
-    max_voters = max_voters
-
-    # initialize the accuracy array
     accuracy = np.zeros([5, n_batch, max_voters - 1])
 
-    logging.info("Vote started : running the different methods ")
+    logging.info("Experiment started : running the different aggregators ...")
+
     for num in tqdm(
         range(1, max_voters), desc="Number of voters", position=0, leave=True
     ):
         for batch in tqdm(range(n_batch), desc="Batch", position=1, leave=False):
-            # Randomly sample num voters
+            voters = sample(
+                list(annotations.index.get_level_values(COLUMNS.voter).unique()), num
+            )
+            annotations_batch = annotations[
+                annotations.index.get_level_values(COLUMNS.voter).isin(voters)
+            ]
 
-            voters = sample(list(annotations[COLUMNS.voter].unique()), num)
-            annotations_batch = annotations[annotations[COLUMNS.voter].isin(voters)]
-
-            # Apply rules to aggregate the answers in parallel
             (
-                standard_approval,
-                weight_sqrt_ham,
-                weight_jaccard,
-                weight_dice,
-                weight_qw,
+                standard_approval_labels,
+                euclid_labels,
+                jaccard_labels,
+                dice_labels,
+                condorcet_labels,
             ) = ray.get(
                 [
                     apply_standard_approval_aggregator.remote(annotations_batch),
@@ -65,25 +55,20 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:
                 ]
             )
 
-            # Put results into numpy arrays
-            G = groundtruth[alternatives].to_numpy().astype(int)
-            Weight_sqrt_ham = weight_sqrt_ham[alternatives].to_numpy().astype(int)
-            Weight_jaccard = weight_jaccard[alternatives].to_numpy().astype(int)
-            Weight_dice = weight_dice[alternatives].to_numpy().astype(int)
-            Weight_qw = weight_qw[alternatives].to_numpy().astype(int)
-            standard_approval = standard_approval[alternatives].to_numpy().astype(int)
-
-            # Compute the accuracy of each method
             rules = (
-                standard_approval,
-                Weight_sqrt_ham,
-                Weight_jaccard,
-                Weight_dice,
-                Weight_qw,
+                standard_approval_labels,
+                euclid_labels,
+                jaccard_labels,
+                dice_labels,
+                condorcet_labels,
             )
             for i, rule in enumerate(rules):
-                accuracy[i, batch, num - 1] = 1 - zero_one_loss(G, rule)
-    logging.info("Vote completed")
+                accuracy[i, batch, num - 1] = 1 - zero_one_loss(
+                    groundtruth.to_numpy().astype(int), rule.to_numpy().astype(int)
+                )
+
+    logging.info("Experiment completed, gathering the results ..")
+
     zero_one_margin = np.zeros([len(rules), max_voters - 1, 3])
     for num in range(1, max_voters):
         for i in range(len(rules)):
