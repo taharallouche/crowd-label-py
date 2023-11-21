@@ -57,9 +57,7 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:
                 weight_qw,
             ) = ray.get(
                 [
-                    apply_standard_approval_aggregator.remote(
-                        annotations_batch, dataset
-                    ),
+                    apply_standard_approval_aggregator.remote(annotations_batch),
                     apply_mallow_aggregator.remote(
                         annotations_batch, dataset, RULES.euclid
                     ),
