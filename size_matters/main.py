@@ -1,5 +1,8 @@
 from size_matters.evaluation.accuracy import compare_methods
-from size_matters.utils.inventory import DATASETS
+from size_matters.utils.inventory import DATASETS, COLUMNS
+from pathlib import Path
+import pandas as pd
+
 
 if __name__ == "__main__":  # pragma: no cover
     dataset_name = input(f"Select a dataset [{'|'.join(DATASETS)}]: ")
@@ -14,4 +17,17 @@ if __name__ == "__main__":  # pragma: no cover
     n_batch = int(input("Choose the number of batches: "))
     assert n_batch > 0, "Please choose a positive number of batches"
 
-    compare_methods(dataset=dataset, max_voters=max_voters, n_batch=n_batch)
+    annotations = pd.read_csv(
+        Path(dataset.path).parent / "annotations.csv",
+        index_col=[COLUMNS.question, COLUMNS.voter],
+    )
+    groundtruth = pd.read_csv(
+        Path(dataset.path).parent / "ground_truth.csv", index_col=[COLUMNS.question]
+    )
+
+    compare_methods(
+        annotations=annotations,
+        groundtruth=groundtruth,
+        max_voters=max_voters,
+        n_batch=n_batch,
+    )

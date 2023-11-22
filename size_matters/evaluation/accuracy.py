@@ -1,4 +1,5 @@
 from random import sample
+import pandas as pd
 import logging
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,8 +12,7 @@ from size_matters.aggregation.aggregators import (
     apply_mallow_aggregator,
     apply_standard_approval_aggregator,
 )
-from size_matters.parsing.data_preparation import prepare_data
-from size_matters.utils.inventory import COLUMNS, PLOT_OPTIONS, RULES, Dataset
+from size_matters.utils.inventory import COLUMNS, PLOT_OPTIONS, RULES
 from size_matters.utils.utils import confidence_margin_mean
 
 logging.basicConfig(
@@ -20,9 +20,9 @@ logging.basicConfig(
 )
 
 
-def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:
-    annotations, groundtruth = prepare_data(dataset)
-
+def compare_methods(
+    annotations: pd.DataFrame, groundtruth: pd.DataFrame, max_voters: int, n_batch: int
+) -> NDArray:
     accuracy = np.zeros([5, n_batch, max_voters - 1])
 
     logging.info("Experiment started : running the different aggregators ...")
@@ -73,14 +73,12 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:
                 accuracy[i, :, num - 1]
             )
 
-    _plot_accuracies(dataset, max_voters, zero_one_margin)
+    _plot_accuracies(max_voters, zero_one_margin)
 
     return zero_one_margin
 
 
-def _plot_accuracies(
-    dataset: Dataset, max_voters: int, zero_one_margin: NDArray
-) -> None:
+def _plot_accuracies(max_voters: int, zero_one_margin: NDArray) -> None:
     fig = plt.figure()  # noqa: unused
 
     for rule, options in PLOT_OPTIONS.items():
@@ -100,5 +98,4 @@ def _plot_accuracies(
     plt.legend()
     plt.xlabel("Number of voters")
     plt.ylabel("Accuracy")
-    plt.title(dataset.name)
     plt.show()
