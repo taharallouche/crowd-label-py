@@ -10,12 +10,8 @@ def test_compare_methods(mock_plt: MagicMock) -> None:
     # Given
     import random
 
-    import ray
-
     from size_matters.evaluation.accuracy import compare_methods
     from size_matters.utils.inventory import DATASETS
-
-    ray.init()
 
     random.seed(42)
     dataset = DATASETS["animals"]

@@ -1,18 +1,15 @@
 import numpy as np
 import pandas as pd
-import ray
 
 from size_matters.utils.inventory import COLUMNS, RELIABILITY_BOUNDS, RULES
 
 
-@ray.remote
 def apply_standard_approval_aggregator(annotations: pd.DataFrame) -> pd.DataFrame:
     aggregated_labels = _get_aggregated_labels(annotations)
 
     return aggregated_labels
 
 
-@ray.remote
 def apply_condorcet_aggregator(annotations: pd.DataFrame) -> pd.DataFrame:
     vote_size = annotations.sum(axis=1)
     reliabilities = (len(annotations.columns) - vote_size - 1) / (
@@ -28,7 +25,6 @@ def apply_condorcet_aggregator(annotations: pd.DataFrame) -> pd.DataFrame:
     return aggregated_labels
 
 
-@ray.remote
 def apply_mallow_aggregator(
     annotations: pd.DataFrame,
     distance: str = RULES.jaccard,
