@@ -2,7 +2,6 @@ from random import sample
 import logging
 import matplotlib.pyplot as plt
 import numpy as np
-import ray
 from numpy.typing import NDArray
 from sklearn.metrics import zero_one_loss
 from tqdm import tqdm
@@ -45,14 +44,12 @@ def compare_methods(dataset: Dataset, max_voters: int, n_batch: int) -> NDArray:
                 jaccard_labels,
                 dice_labels,
                 condorcet_labels,
-            ) = ray.get(
-                [
-                    apply_standard_approval_aggregator.remote(annotations_batch),
-                    apply_mallow_aggregator.remote(annotations_batch, RULES.euclid),
-                    apply_mallow_aggregator.remote(annotations_batch, RULES.jaccard),
-                    apply_mallow_aggregator.remote(annotations_batch, RULES.dice),
-                    apply_condorcet_aggregator.remote(annotations_batch),
-                ]
+            ) = (
+                apply_standard_approval_aggregator(annotations_batch),
+                apply_mallow_aggregator(annotations_batch, RULES.euclid),
+                apply_mallow_aggregator(annotations_batch, RULES.jaccard),
+                apply_mallow_aggregator(annotations_batch, RULES.dice),
+                apply_condorcet_aggregator(annotations_batch),
             )
 
             rules = (

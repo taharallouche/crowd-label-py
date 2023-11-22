@@ -1,11 +1,7 @@
-import ray
-
 from size_matters.evaluation.accuracy import compare_methods
 from size_matters.utils.inventory import DATASETS
 
 if __name__ == "__main__":  # pragma: no cover
-    ray.init()
-
     dataset_name = input(f"Select a dataset [{'|'.join(DATASETS)}]: ")
     assert dataset_name in DATASETS, "Invalid dataset"
     dataset = DATASETS[dataset_name]
