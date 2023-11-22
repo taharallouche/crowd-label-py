@@ -3,7 +3,6 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Dataset:
-    name: str
     path: str
     alternatives: list
     nbr_questions: int
@@ -47,7 +46,6 @@ COLUMNS = _COLUMNS()
 
 
 ANIMALS_DATASET = Dataset(
-    "animals",
     "data/animals/raw.csv",
     ["Leopard", "Tiger", "Puma", "Jaguar", "Lion(ess)", "Cheetah"],
     16,
@@ -55,7 +53,6 @@ ANIMALS_DATASET = Dataset(
 )
 
 TEXTURES_DATASET = Dataset(
-    "textures",
     "data/textures/raw.csv",
     ["Gravel", "Grass", "Brick", "Wood", "Sand", "Cloth"],
     16,
@@ -63,7 +60,6 @@ TEXTURES_DATASET = Dataset(
 )
 
 LANGUAGE_DATASET = Dataset(
-    "languages",
     "data/languages/raw.csv",
     [
         "Hebrew",

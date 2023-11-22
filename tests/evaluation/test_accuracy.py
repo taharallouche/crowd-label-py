@@ -1,22 +1,30 @@
 from unittest.mock import MagicMock, patch
-
+import pandas as pd
 import numpy as np
 import pytest
+from pathlib import Path
 
 
 @pytest.mark.e2e
-@patch("size_matters.evaluation.accuracy.plt")
-def test_compare_methods(mock_plt: MagicMock) -> None:
+@patch("size_matters.evaluation.accuracy._plot_accuracies")
+def test_compare_methods(mock_plot_accuracies: MagicMock) -> None:
     # Given
     import random
 
     from size_matters.evaluation.accuracy import compare_methods
-    from size_matters.utils.inventory import DATASETS
+    from size_matters.utils.inventory import DATASETS, COLUMNS
 
     random.seed(42)
     dataset = DATASETS["animals"]
     max_voters = 5
     n_batch = 5
+    ground_truth = pd.read_csv(
+        Path(dataset.path).parent / "ground_truth.csv", index_col=[COLUMNS.question]
+    )
+    annotations = pd.read_csv(
+        Path(dataset.path).parent / "annotations.csv",
+        index_col=[COLUMNS.question, COLUMNS.voter],
+    )
     expected_output = np.array(
         [
             [
@@ -53,7 +61,7 @@ def test_compare_methods(mock_plt: MagicMock) -> None:
     )
 
     # When
-    result = compare_methods(dataset, max_voters, n_batch)
+    result = compare_methods(annotations, ground_truth, max_voters, n_batch)
 
     # Then
     np.testing.assert_allclose(result, expected_output, rtol=1e-6)
