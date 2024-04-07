@@ -4,7 +4,7 @@ import logging
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.typing import NDArray
-from sklearn.metrics import zero_one_loss
+from sklearn.metrics import accuracy_score
 from tqdm import tqdm
 
 from size_matters.aggregation.aggregators import (
@@ -60,9 +60,7 @@ def compare_methods(
                 condorcet_labels,
             )
             for i, rule in enumerate(rules):
-                accuracy[i, batch, num - 1] = 1 - zero_one_loss(
-                    groundtruth.to_numpy().astype(int), rule.to_numpy().astype(int)
-                )
+                accuracy[i, batch, num - 1] = accuracy_score(groundtruth, rule)
 
     logging.info("Experiment completed, gathering the results ..")
 
