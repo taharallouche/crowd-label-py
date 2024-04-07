@@ -8,11 +8,14 @@ from sklearn.metrics import accuracy_score
 from tqdm import tqdm
 
 from size_matters.aggregation.aggregators import (
-    apply_condorcet_aggregator,
-    apply_mallow_aggregator,
-    apply_standard_approval_aggregator,
+    StandardApprovalAggregator,
+    CondorcetAggregator,
+    EuclidAggregator,
+    JaccardAggregator,
+    DiceAggregator,
+    Aggregator,
 )
-from size_matters.utils.inventory import COLUMNS, PLOT_OPTIONS, RULES
+from size_matters.utils.inventory import COLUMNS, PLOT_OPTIONS
 from size_matters.utils.utils import confidence_margin_mean
 
 logging.basicConfig(
@@ -24,6 +27,13 @@ def compare_methods(
     annotations: pd.DataFrame, groundtruth: pd.DataFrame, max_voters: int, n_batch: int
 ) -> NDArray:
     accuracy = np.zeros([5, n_batch, max_voters - 1])
+    aggregators: list[Aggregator] = [
+        StandardApprovalAggregator(),
+        EuclidAggregator(),
+        JaccardAggregator(),
+        DiceAggregator(),
+        CondorcetAggregator(),
+    ]
 
     logging.info("Experiment started : running the different aggregators ...")
 
@@ -38,35 +48,17 @@ def compare_methods(
                 annotations.index.get_level_values(COLUMNS.voter).isin(voters)
             ]
 
-            (
-                standard_approval_labels,
-                euclid_labels,
-                jaccard_labels,
-                dice_labels,
-                condorcet_labels,
-            ) = (
-                apply_standard_approval_aggregator(annotations_batch),
-                apply_mallow_aggregator(annotations_batch, RULES.euclid),
-                apply_mallow_aggregator(annotations_batch, RULES.jaccard),
-                apply_mallow_aggregator(annotations_batch, RULES.dice),
-                apply_condorcet_aggregator(annotations_batch),
-            )
-
-            rules = (
-                standard_approval_labels,
-                euclid_labels,
-                jaccard_labels,
-                dice_labels,
-                condorcet_labels,
-            )
-            for i, rule in enumerate(rules):
-                accuracy[i, batch, num - 1] = accuracy_score(groundtruth, rule)
+            for i, aggregator in enumerate(aggregators):
+                aggregated_labels = aggregator.aggregate(annotations_batch)
+                accuracy[i, batch, num - 1] = accuracy_score(
+                    groundtruth, aggregated_labels
+                )
 
     logging.info("Experiment completed, gathering the results ..")
 
-    zero_one_margin = np.zeros([len(rules), max_voters - 1, 3])
+    zero_one_margin = np.zeros([len(aggregators), max_voters - 1, 3])
     for num in range(1, max_voters):
-        for i in range(len(rules)):
+        for i in range(len(aggregators)):
             zero_one_margin[i, num - 1, :] = confidence_margin_mean(
                 accuracy[i, :, num - 1]
             )
