@@ -1,5 +1,3 @@
-line-length = 88
-
 [format]
 indent-style = "tab"
 docstring-code-format = true
