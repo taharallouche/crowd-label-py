@@ -10,7 +10,7 @@ from size_matters.utils.inventory import COLUMNS
 @pytest.mark.parametrize("dataset", ["animals", "languages", "textures"])
 def test_prepare_data(dataset) -> None:
 	# With
-	from size_matters.parsing.data_preparation import prepare_data
+	from size_matters._parsing.data_preparation import prepare_data
 	from size_matters.utils.inventory import DATASETS
 
 	dataset = DATASETS[dataset]
