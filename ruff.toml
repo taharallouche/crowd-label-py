@@ -1,0 +1,23 @@
+line-length = 88
+
+[format]
+indent-style = "tab"
+docstring-code-format = true
+
+
+
+[lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+]
