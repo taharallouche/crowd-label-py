@@ -47,17 +47,12 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
 
-lint/flake8: ## check style with flake8
-	flake8 size_matters tests --count --max-complexity=7 --max-line-length=88 --statistics
-
-lint/black: ## check style with black
-	black --check size_matters tests --line-length=88
 
 typing-py: ## check typing
 	mypy size_matters --follow-imports=skip --ignore-missing-imports
 
-lint: lint/flake8 lint/black
-	
+lint:
+	ruff check
 
 test:  ## run tests quickly with the default Python
 	pytest -vvv
