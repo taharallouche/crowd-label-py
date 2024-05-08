@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from size_matters.evaluation.accuracy import compare_methods
+from size_matters._evaluation.accuracy import compare_methods
 from size_matters.utils.inventory import COLUMNS, DATASETS
 
 if __name__ == "__main__":  # pragma: no cover
