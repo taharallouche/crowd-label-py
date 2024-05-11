@@ -31,12 +31,12 @@ class _RULES:
 
 
 @dataclass(frozen=True)
-class _RELIABILITY_BOUNDS:
+class _DEFAULT_RELIABILITY_BOUNDS:
 	lower: float = 10**-3
 	upper: float = 1 - 10**-3
 
 
-RELIABILITY_BOUNDS = _RELIABILITY_BOUNDS()
+DEFAULT_RELIABILITY_BOUNDS = _DEFAULT_RELIABILITY_BOUNDS()
 
 
 RULES = _RULES()
