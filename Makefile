@@ -49,7 +49,7 @@ clean-test: ## remove test and coverage artifacts
 
 
 typing-py: ## check typing
-	mypy size_matters --follow-imports=skip --ignore-missing-imports
+	mypy crowd_label --follow-imports=skip --ignore-missing-imports
 
 lint:
 	ruff check
@@ -57,18 +57,18 @@ lint:
 test:  ## run tests quickly with the default Python
 	pytest -vvv
 
-test-all: lint test
+test-all: lint typing-py test 
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source size_matters -m pytest
+	coverage run --source crowd_label -m pytest
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
 build-docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/size_matters.rst
+	rm -f docs/crowd_label.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ size_matters
+	sphinx-apidoc -o docs/ crowd_label
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 
