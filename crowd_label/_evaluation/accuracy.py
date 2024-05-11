@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 from sklearn.metrics import accuracy_score
 from tqdm import tqdm
 
-from size_matters.aggregation.aggregators import (
+from crowd_label.aggregation.aggregators import (
 	Aggregator,
 	CondorcetAggregator,
 	DiceAggregator,
@@ -16,8 +16,8 @@ from size_matters.aggregation.aggregators import (
 	JaccardAggregator,
 	StandardApprovalAggregator,
 )
-from size_matters.utils.inventory import COLUMNS, PLOT_OPTIONS
-from size_matters.utils.utils import confidence_margin_mean
+from crowd_label.utils.inventory import COLUMNS, PLOT_OPTIONS
+from crowd_label.utils.utils import confidence_margin_mean
 
 logging.basicConfig(
 	level=logging.INFO, format="'%(asctime)s - %(levelname)s - %(message)s'"

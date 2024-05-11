@@ -6,14 +6,14 @@ description = (
 )
 
 setup(
-	name="size_matters",
+	name="crowd_label_py",
 	version="0.1.0",
 	description=description,
 	url="https://github.com/taharallouche/crowd-label-py",
 	author="Tahar Allouche",
-	author_email="tahar.allouche@dauphine.eu",
+	author_email="tahar.allouche.pro@gmail.com",
 	license="BSD 2-clause",
-	packages=find_packages(include=["size_matters", "size_matters.*"]),
+	packages=find_packages(include=["crowd_label", "crowd_label.*"]),
 	install_requires=[
 		"numpy>=1.24.1",
 		"scipy>=1.10.0",

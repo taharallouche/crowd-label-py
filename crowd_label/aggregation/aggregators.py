@@ -4,7 +4,7 @@ from typing import Callable
 import numpy as np
 import pandas as pd
 
-from size_matters.utils.inventory import COLUMNS, RELIABILITY_BOUNDS
+from crowd_label.utils.inventory import COLUMNS, RELIABILITY_BOUNDS
 
 
 class Aggregator(ABC):
