@@ -7,13 +7,13 @@ import pytest
 
 
 @pytest.mark.e2e
-@patch("size_matters._evaluation.accuracy._plot_accuracies")
+@patch("crowd_label._evaluation.accuracy._plot_accuracies")
 def test_compare_methods(mock_plot_accuracies: MagicMock) -> None:
 	# Given
 	import random
 
-	from size_matters._evaluation.accuracy import compare_methods
-	from size_matters.utils.inventory import COLUMNS, DATASETS
+	from crowd_label._evaluation.accuracy import compare_methods
+	from crowd_label.utils.inventory import COLUMNS, DATASETS
 
 	random.seed(42)
 	dataset = DATASETS["animals"]

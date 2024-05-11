@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from size_matters.utils.utils import confidence_margin_mean
+from crowd_label.utils.utils import confidence_margin_mean
 
 
 @pytest.mark.ut
