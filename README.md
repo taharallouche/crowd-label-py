@@ -20,7 +20,7 @@ Various weighting schemes are provided to the user, with each one being optimal 
 ## First guide: How to reproduce the paper's results
 After cloning the repo, you should:
 1. `make install-dev`: this will install all the requirements (via `pip`) and setup the package on develop mode.
-2. `python3 size_matters/main.py`: this will execute the python script for comparing the aggregation rules and showing the results. You will be asked to enter your preferences, like choosing the dataset, the number of voters and the number of simulations.
+2. `python3 crowd_label/_reproduce_paper_results.py`: this will execute the python script for comparing the aggregation rules and showing the results. You will be asked to enter your preferences, like choosing the dataset, the number of voters and the number of simulations.
 
 ## Second guide: How to use crowd-label-py to process your data
 Coming Soon .. 📆
