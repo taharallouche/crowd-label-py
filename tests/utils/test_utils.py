@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from crowd_label.utils.utils import confidence_margin_mean
+from crowd_label.utils.utils import get_mean_confidence_interval
 
 
 @pytest.mark.ut
@@ -25,6 +25,6 @@ from crowd_label.utils.utils import confidence_margin_mean
 		),
 	],
 )
-def test_confidence_margin_mean(data, confidence, expected):
-	result = confidence_margin_mean(data, confidence)
+def test_get_mean_confidence_interval(data, confidence, expected):
+	result = get_mean_confidence_interval(data, confidence)
 	assert result == pytest.approx(expected, abs=1e-6)

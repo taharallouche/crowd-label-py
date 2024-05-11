@@ -1,5 +1,7 @@
 import logging
+from collections.abc import Iterable
 from random import sample
+from typing import Mapping
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,8 +18,8 @@ from crowd_label.aggregation.aggregators import (
 	JaccardAggregator,
 	StandardApprovalAggregator,
 )
-from crowd_label.utils.inventory import COLUMNS, PLOT_OPTIONS
-from crowd_label.utils.utils import confidence_margin_mean
+from crowd_label.utils.inventory import COLUMNS
+from crowd_label.utils.utils import get_mean_confidence_interval
 
 logging.basicConfig(
 	level=logging.INFO, format="'%(asctime)s - %(levelname)s - %(message)s'"
@@ -25,16 +27,25 @@ logging.basicConfig(
 
 
 def compare_methods(
-	annotations: pd.DataFrame, groundtruth: pd.DataFrame, max_voters: int, n_batch: int
-) -> NDArray:
-	accuracy = np.zeros([5, n_batch, max_voters - 1])
-	aggregators: list[Aggregator] = [
+	annotations: pd.DataFrame,
+	groundtruth: pd.DataFrame,
+	max_voters: int,
+	n_batch: int,
+	aggregators: Iterable[Aggregator] = (
 		StandardApprovalAggregator(),
 		EuclidAggregator(),
 		JaccardAggregator(),
 		DiceAggregator(),
 		CondorcetAggregator(),
-	]
+	),
+) -> dict[str, NDArray]:
+	accuracy = {
+		str(aggregator): np.zeros([n_batch, max_voters - 1])
+		for aggregator in aggregators
+	}
+	confidence_intervals = {
+		str(aggregator): np.zeros([max_voters - 1, 3]) for aggregator in aggregators
+	}
 
 	logging.info("Experiment started : running the different aggregators ...")
 
@@ -49,40 +60,39 @@ def compare_methods(
 				annotations.index.get_level_values(COLUMNS.voter).isin(voters)
 			]
 
-			for i, aggregator in enumerate(aggregators):
+			for aggregator in aggregators:
 				aggregated_labels = aggregator.aggregate(annotations_batch)
-				accuracy[i, batch, num - 1] = accuracy_score(
+				accuracy[str(aggregator)][batch, num - 1] = accuracy_score(
 					groundtruth, aggregated_labels
 				)
 
-	logging.info("Experiment completed, gathering the results ..")
-
-	zero_one_margin = np.zeros([len(aggregators), max_voters - 1, 3])
-	for num in range(1, max_voters):
-		for i in range(len(aggregators)):
-			zero_one_margin[i, num - 1, :] = confidence_margin_mean(
-				accuracy[i, :, num - 1]
+		for aggregator in aggregators:
+			confidence_intervals[str(aggregator)][num - 1, :] = (
+				get_mean_confidence_interval(accuracy[str(aggregator)][:, num - 1])
 			)
 
-	_plot_accuracies(max_voters, zero_one_margin)
+	logging.info("Experiment completed, gathering the results ..")
 
-	return zero_one_margin
+	_plot_accuracies(max_voters, confidence_intervals)
+
+	return confidence_intervals
 
 
-def _plot_accuracies(max_voters: int, zero_one_margin: NDArray) -> None:
+def _plot_accuracies(
+	max_voters: int, confidence_intervals: Mapping[str, NDArray]
+) -> None:
 	fig = plt.figure()  # noqa: F841
 
-	for rule, options in PLOT_OPTIONS.items():
+	for aggregator, confidence_interval in confidence_intervals.items():
 		plt.errorbar(
 			range(1, max_voters),
-			zero_one_margin[options["index"], :, 0],
-			label=rule,
-			linestyle=options["linestyle"],
+			confidence_interval[:, 0],
+			label=aggregator,
 		)
 		plt.fill_between(
 			range(1, max_voters),
-			zero_one_margin[options["index"], :, 1],
-			zero_one_margin[options["index"], :, 2],
+			confidence_interval[:, 1],
+			confidence_interval[:, 2],
 			alpha=0.2,
 		)
 

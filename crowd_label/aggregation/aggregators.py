@@ -8,14 +8,14 @@ from crowd_label.utils.inventory import COLUMNS, DEFAULT_RELIABILITY_BOUNDS
 
 
 class Aggregator(ABC):
-	__name: str
+	_name: str
 
 	@abstractmethod
 	def aggregate(self, annotations: pd.DataFrame, **kwargs) -> pd.DataFrame:
 		pass
 
 	def __str__(self) -> str:
-		return self.__name
+		return self._name
 
 
 class VoterMixin:
@@ -52,7 +52,7 @@ class WeightedAggregator(Aggregator, VoterMixin):
 
 
 class StandardApprovalAggregator(WeightedAggregator):
-	__name: str = "Standard Approval Aggregator"
+	_name: str = "Standard Approval Aggregator"
 
 	_weight_calculator = lambda vote_size: pd.Series(  # noqa : E731
 		1 * len(vote_size), index=vote_size.index
@@ -60,7 +60,7 @@ class StandardApprovalAggregator(WeightedAggregator):
 
 
 class CondorcetAggregator(VoterMixin, Aggregator):
-	__name: str = "Condorcet Aggregator"
+	_name: str = "Condorcet Aggregator"
 
 	def __init__(
 		self,
@@ -85,17 +85,17 @@ class CondorcetAggregator(VoterMixin, Aggregator):
 
 
 class EuclidAggregator(WeightedAggregator):
-	__name: str = "Euclidean Mallow Aggregator"
+	_name: str = "Euclidean Mallow Aggregator"
 	_weight_calculator = lambda vote_size: np.sqrt(  # noqa : E731
 		vote_size + 1
 	) - np.sqrt(vote_size - 1)
 
 
 class JaccardAggregator(WeightedAggregator):
-	__name: str = "Jaccard Mallow Aggregator"
+	_name: str = "Jaccard Mallow Aggregator"
 	_weight_calculator = lambda vote_size: 1 / vote_size  # noqa : E731
 
 
 class DiceAggregator(WeightedAggregator):
-	__name: str = "Dice Mallow Aggregator"
+	_name: str = "Dice Mallow Aggregator"
 	_weight_calculator = lambda vote_size: 2 / (vote_size + 1)  # noqa : E731
