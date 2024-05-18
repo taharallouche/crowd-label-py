@@ -73,24 +73,23 @@ def compare_methods(
 
 	logging.info("Experiment completed, gathering the results ..")
 
-	_plot_accuracies(max_voters, confidence_intervals)
-
 	return confidence_intervals
 
 
-def _plot_accuracies(
-	max_voters: int, confidence_intervals: Mapping[str, NDArray]
-) -> None:
+def plot_accuracies(confidence_intervals: Mapping[str, NDArray]) -> None:
 	fig = plt.figure()  # noqa: F841
+	x_limit = (
+		max(accuracies.shape[0] for accuracies in confidence_intervals.values()) + 1
+	)
 
 	for aggregator, confidence_interval in confidence_intervals.items():
 		plt.errorbar(
-			range(1, max_voters),
+			range(1, x_limit),
 			confidence_interval[:, 0],
 			label=aggregator,
 		)
 		plt.fill_between(
-			range(1, max_voters),
+			range(1, x_limit),
 			confidence_interval[:, 1],
 			confidence_interval[:, 2],
 			alpha=0.2,

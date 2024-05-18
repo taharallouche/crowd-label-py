@@ -1,5 +1,4 @@
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pandas as pd
@@ -7,8 +6,7 @@ import pytest
 
 
 @pytest.mark.e2e
-@patch("crowd_label._evaluation.accuracy._plot_accuracies")
-def test_compare_methods(mock_plot_accuracies: MagicMock) -> None:
+def test_compare_methods() -> None:
 	# Given
 	import random
 
