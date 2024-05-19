@@ -25,13 +25,11 @@ class VoterMixin:
 
 		scores = scores.reindex(votes.index.get_level_values(COLUMNS.question).unique())
 
-		winning_alternatives = pd.Categorical(
-			scores.idxmax(axis=1),
-			categories=votes.columns,
-			ordered=True,
+		winning_alternatives = scores.idxmax(axis=1).astype(
+			pd.CategoricalDtype(categories=votes.columns)
 		)
 
-		aggregated_labels = pd.get_dummies(winning_alternatives, columns=votes.columns)
+		aggregated_labels = pd.get_dummies(winning_alternatives)
 
 		return aggregated_labels
 

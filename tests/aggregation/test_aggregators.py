@@ -14,11 +14,16 @@ def test_VoterMixin_handles_empty_input():
 		index=pd.MultiIndex.from_tuples((), names=[COLUMNS.question, COLUMNS.voter]),
 	)
 
+	expected_result = pd.DataFrame(
+		columns=pd.CategoricalIndex(
+			["a", "b"], categories=["a", "b"], ordered=False, dtype="category"
+		),
+		index=pd.Index([], name=COLUMNS.question),
+		dtype="uint8",
+	)
+
 	# Then
 	result = VoterMixin._get_aggregated_labels(annotations)
 
 	# Then
-	assert result.empty
-	pd.testing.assert_index_equal(
-		result.columns, annotations.columns, check_categorical=False, exact=False
-	)
+	pd.testing.assert_frame_equal(expected_result, result)
