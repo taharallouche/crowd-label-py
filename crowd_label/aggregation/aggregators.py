@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Callable
 
 import numpy as np
 import pandas as pd
@@ -11,8 +10,8 @@ class Aggregator(ABC):
 	_name: str
 
 	@abstractmethod
-	def aggregate(self, annotations: pd.DataFrame, **kwargs) -> pd.DataFrame:
-		pass
+	def aggregate(self, annotations: pd.DataFrame) -> pd.DataFrame:
+		raise NotImplementedError
 
 	def __str__(self) -> str:
 		return self._name
@@ -35,29 +34,19 @@ class VoterMixin:
 
 
 class WeightedAggregator(Aggregator, VoterMixin):
-	@property
 	@abstractmethod
-	def _weight_calculator(self) -> Callable[[pd.Series], pd.Series]:
-		pass
+	def _compute_weights(self, annotations: pd.DataFrame) -> pd.Series:
+		raise NotImplementedError
 
-	def aggregate(self, annotations: pd.DataFrame, **kwargs) -> pd.DataFrame:
-		vote_size = annotations.sum(axis=1)
-		weights = type(self)._weight_calculator(vote_size)
+	def aggregate(self, annotations: pd.DataFrame) -> pd.DataFrame:
+		weights = self._compute_weights(annotations)
 
 		weighted_answers = annotations.multiply(weights, axis="index")
 
 		return self._get_aggregated_labels(weighted_answers)
 
 
-class StandardApprovalAggregator(WeightedAggregator):
-	_name: str = "Standard Approval Aggregator"
-
-	_weight_calculator = lambda vote_size: pd.Series(  # noqa : E731
-		1 * len(vote_size), index=vote_size.index
-	)
-
-
-class CondorcetAggregator(VoterMixin, Aggregator):
+class CondorcetAggregator(WeightedAggregator):
 	_name: str = "Condorcet Aggregator"
 
 	def __init__(
@@ -68,7 +57,7 @@ class CondorcetAggregator(VoterMixin, Aggregator):
 		self.lower_reliability_bound = lower_reliability_bound
 		self.upper_reliability_bound = upper_reliability_bound
 
-	def aggregate(self, annotations: pd.DataFrame, **kwargs) -> pd.DataFrame:
+	def _compute_weights(self, annotations: pd.DataFrame) -> pd.Series:
 		vote_size = annotations.sum(axis=1)
 		reliabilities = (len(annotations.columns) - vote_size - 1) / (
 			len(annotations.columns) - 2
@@ -77,23 +66,40 @@ class CondorcetAggregator(VoterMixin, Aggregator):
 			self.lower_reliability_bound, self.upper_reliability_bound
 		)
 		weights = np.log(reliabilities / (1 - reliabilities))
-		weighted_answers = annotations.multiply(weights, axis="index")
 
-		return self._get_aggregated_labels(weighted_answers)
+		return weights
+
+
+class StandardApprovalAggregator(WeightedAggregator):
+	_name: str = "Standard Approval Aggregator"
+
+	@staticmethod
+	def _compute_weights(annotations: pd.DataFrame) -> pd.Series:
+		return pd.Series(1, index=annotations.index)
 
 
 class EuclidAggregator(WeightedAggregator):
 	_name: str = "Euclidean Mallow Aggregator"
-	_weight_calculator = lambda vote_size: np.sqrt(  # noqa : E731
-		vote_size + 1
-	) - np.sqrt(vote_size - 1)
+
+	@staticmethod
+	def _compute_weights(annotations: pd.DataFrame) -> pd.Series:
+		vote_size = annotations.sum(axis=1)
+		return np.sqrt(vote_size + 1) - np.sqrt(vote_size - 1)
 
 
 class JaccardAggregator(WeightedAggregator):
 	_name: str = "Jaccard Mallow Aggregator"
-	_weight_calculator = lambda vote_size: 1 / vote_size  # noqa : E731
+
+	@staticmethod
+	def _compute_weights(annotations: pd.DataFrame) -> pd.Series:
+		vote_size = annotations.sum(axis=1)
+		return 1 / vote_size
 
 
 class DiceAggregator(WeightedAggregator):
 	_name: str = "Dice Mallow Aggregator"
-	_weight_calculator = lambda vote_size: 2 / (vote_size + 1)  # noqa : E731
+
+	@staticmethod
+	def _compute_weights(annotations: pd.DataFrame) -> pd.Series:
+		vote_size = annotations.sum(axis=1)
+		return 2 / (vote_size + 1)
