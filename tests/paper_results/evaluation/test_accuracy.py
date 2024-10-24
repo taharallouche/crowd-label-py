@@ -10,8 +10,8 @@ def test_compare_methods() -> None:
 	# Given
 	import random
 
-	from crowd_label._evaluation.accuracy import compare_methods
-	from crowd_label.utils.inventory import COLUMNS, DATASETS
+	from crowd_label.core.utils.inventory import COLUMNS, DATASETS
+	from crowd_label.paper_results.evaluation.accuracy import compare_methods
 
 	random.seed(42)
 	dataset = DATASETS["animals"]

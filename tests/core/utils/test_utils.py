@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from crowd_label.utils.utils import get_mean_confidence_interval
+from crowd_label.core.utils.utils import get_mean_confidence_interval
 
 
 @pytest.mark.ut

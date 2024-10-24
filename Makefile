@@ -49,7 +49,7 @@ clean-test: ## remove test and coverage artifacts
 
 
 typing-py: ## check typing
-	mypy crowd_label --follow-imports=skip --ignore-missing-imports
+	mypy crowd_label --ignore-missing-imports
 
 lint:
 	ruff check
@@ -86,12 +86,5 @@ dist: clean ## builds source and wheel package
 	python setup.py bdist_wheel
 	ls -l dist
 
-install: clean ## install the package to the active Python's site-packages
-	python setup.py install
-
-install-dev: clean ## install the package to the active Python's site-packages
-	pip install -r requirements.txt
-	python setup.py develop
-
-test-release: dist ## test package and upload a release
-	twine upload --repository testpypi --config-file ../.pypirc dist/*
+reproduce: ## reproduce the results
+	python -m crowd_label.paper_results.main
