@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from crowd_label.utils.inventory import COLUMNS, Dataset
+from crowd_label.core.utils.inventory import COLUMNS, Dataset
 
 
 def _get_column_names(name: str, nbr_questions: int) -> list[str]:
@@ -77,7 +77,7 @@ def _get_annotations(
 			row = {COLUMNS.voter: j, COLUMNS.question: questions[i]}
 			for alternative in alternatives:
 				row[alternative] = int(alternative in L)
-			annotations = annotations.append(row, ignore_index=True)
+			annotations = annotations._append(row, ignore_index=True)
 	annotations[alternatives] = annotations[alternatives].astype(int)
 	return annotations.set_index([COLUMNS.question, COLUMNS.voter])
 

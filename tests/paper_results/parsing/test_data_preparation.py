@@ -3,15 +3,15 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from crowd_label.utils.inventory import COLUMNS
+from crowd_label.core.utils.inventory import COLUMNS
 
 
 @pytest.mark.e2e
 @pytest.mark.parametrize("dataset", ["animals", "languages", "textures"])
 def test_prepare_data(dataset) -> None:
 	# With
-	from crowd_label._parsing.data_preparation import prepare_data
-	from crowd_label.utils.inventory import DATASETS
+	from crowd_label.core.utils.inventory import DATASETS
+	from crowd_label.paper_results.parsing.data_preparation import prepare_data
 
 	dataset = DATASETS[dataset]
 	expected_ground_truth = pd.read_csv(

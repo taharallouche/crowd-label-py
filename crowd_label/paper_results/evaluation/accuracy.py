@@ -10,16 +10,16 @@ from numpy.typing import NDArray
 from sklearn.metrics import accuracy_score
 from tqdm import tqdm
 
-from crowd_label.aggregation.aggregators import (
-	Aggregator,
+from crowd_label.core.aggregation.aggregators import (
 	CondorcetAggregator,
 	DiceAggregator,
 	EuclidAggregator,
 	JaccardAggregator,
 	StandardApprovalAggregator,
 )
-from crowd_label.utils.inventory import COLUMNS
-from crowd_label.utils.utils import get_mean_confidence_interval
+from crowd_label.core.aggregation.base import Aggregator
+from crowd_label.core.utils.inventory import COLUMNS
+from crowd_label.core.utils.utils import get_mean_confidence_interval
 
 logging.basicConfig(
 	level=logging.INFO, format="'%(asctime)s - %(levelname)s - %(message)s'"
@@ -98,4 +98,4 @@ def plot_accuracies(confidence_intervals: Mapping[str, NDArray]) -> None:
 	plt.legend()
 	plt.xlabel("Number of voters")
 	plt.ylabel("Accuracy")
-	plt.show()
+	plt.savefig("results.png")

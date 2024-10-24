@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  test-n-lint:
+  test-and-lint:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -17,20 +17,23 @@ jobs:
         python-version: ["3.11"]
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+    - uses: actions/checkout@v4
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        make install-dev
-    - name: Lint
-      run: |
-        make lint
-    - name: Type check
-      run: |
-        make typing-py
-    - name: unit and end-to-end tests
-      run: |
-        make test
+        # Install a specific version of uv.
+        version: "0.4.15"
+    - name: Set up Python
+      run: uv python install
+
+    - name: Install the project
+      run: uv sync --all-extras --dev
+
+    - name: Check linting
+      run: uv run make lint
+
+    - name: Check typing
+      run: uv run make typing-py
+
+    - name: Run tests
+      run: uv run make test

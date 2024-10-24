@@ -2,8 +2,11 @@ from pathlib import Path
 
 import pandas as pd
 
-from crowd_label._evaluation.accuracy import compare_methods, plot_accuracies
-from crowd_label.utils.inventory import COLUMNS, DATASETS
+from crowd_label.core.utils.inventory import COLUMNS, DATASETS
+from crowd_label.paper_results.evaluation.accuracy import (
+	compare_methods,
+	plot_accuracies,
+)
 
 
 def _process_dataset() -> None:
