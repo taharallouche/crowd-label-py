@@ -1,5 +1,4 @@
 import logging
-from collections.abc import Iterable
 from random import sample
 from typing import Mapping
 
@@ -10,8 +9,10 @@ from numpy.typing import NDArray
 from sklearn.metrics import accuracy_score
 from tqdm import tqdm
 
-from hakeem.core.aggregation.aggregators import (
+from hakeem.core.aggregation.aggregators.condorcet import (
 	CondorcetAggregator,
+)
+from hakeem.core.aggregation.aggregators.mallows import (
 	DiceAggregator,
 	EuclidAggregator,
 	JaccardAggregator,
@@ -31,20 +32,19 @@ def compare_methods(
 	groundtruth: pd.DataFrame,
 	max_voters: int,
 	n_batch: int,
-	aggregators: Iterable[Aggregator] = (
-		StandardApprovalAggregator(),
-		EuclidAggregator(),
-		JaccardAggregator(),
-		DiceAggregator(),
-		CondorcetAggregator(),
-	),
+	aggregators: Mapping[str, Aggregator] = {
+		"Standard Approval Aggregator": StandardApprovalAggregator(),
+		"Euclidean Mallow Aggregator": EuclidAggregator(),
+		"Jaccard Mallow Aggregator": JaccardAggregator(),
+		"Dice Mallow Aggregator": DiceAggregator(),
+		"Condorcet Aggregator": CondorcetAggregator(),
+	},
 ) -> dict[str, NDArray]:
 	accuracy = {
-		str(aggregator): np.zeros([n_batch, max_voters - 1])
-		for aggregator in aggregators
+		aggregator: np.zeros([n_batch, max_voters - 1]) for aggregator in aggregators
 	}
 	confidence_intervals = {
-		str(aggregator): np.zeros([max_voters - 1, 3]) for aggregator in aggregators
+		aggregator: np.zeros([max_voters - 1, 3]) for aggregator in aggregators
 	}
 
 	logging.info("Experiment started : running the different aggregators ...")
@@ -60,15 +60,15 @@ def compare_methods(
 				annotations.index.get_level_values(COLUMNS.voter).isin(voters)
 			]
 
-			for aggregator in aggregators:
-				aggregated_labels = aggregator.aggregate(annotations_batch)
-				accuracy[str(aggregator)][batch, num - 1] = accuracy_score(
+			for name, aggregator in aggregators.items():
+				aggregated_labels = aggregator.fit_predict(annotations_batch)
+				accuracy[name][batch, num - 1] = accuracy_score(
 					groundtruth, aggregated_labels
 				)
 
-		for aggregator in aggregators:
-			confidence_intervals[str(aggregator)][num - 1, :] = (
-				get_mean_confidence_interval(accuracy[str(aggregator)][:, num - 1])
+		for name in aggregators:
+			confidence_intervals[name][num - 1, :] = get_mean_confidence_interval(
+				accuracy[name][:, num - 1]
 			)
 
 	logging.info("Experiment completed, gathering the results ..")
