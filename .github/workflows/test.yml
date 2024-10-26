@@ -1,4 +1,4 @@
-name: crowd-label-CI
+name: hakeem-CI
 
 on:
   push:
