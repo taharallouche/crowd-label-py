@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from hakeem.core.aggregation.base import WeightedAggregator
+from hakeem.aggregation.base import WeightedAggregator
 
 
 class StandardApprovalAggregator(WeightedAggregator):

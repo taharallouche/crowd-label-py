@@ -1,8 +1,6 @@
-# :mage_man: hakeem :mage_man:
+# :mage_man: hakeem (حَكِيمْ) :mage_man:
 
-This python package serves two purposes:
-1. Ensures the reporucibility of my [AAAI-2022 paper](https://ojs.aaai.org/index.php/AAAI/article/view/20403)'s experiments, introducing the **vote-size-matters** crowdsourcing data labelling method. 📚🧪📊
-2. Enable you to apply the data labelling method to your own datasets.🛠️🗃️
+Apply state-of-the-art data labelling methods to your own datasets.🛠️🗃️
 
 
 ## The vote-size-matters collective labelling method
@@ -17,12 +15,6 @@ In fact, the method's key principles include:
 
 Various weighting schemes are provided to the user, with each one being optimal under different assumptions. The choice of the right scheme is yours to make!
 
-## First guide: How to reproduce the paper's results
-After cloning the repo, you should:
-1. install [uv](https://docs.astral.sh/uv/).
-2. run the following command in the terminal:
- ```bash session 
- uv run make reproduce
- ```
-  This will run the python script for comparing the aggregation rules and saving the results. You will be asked to enter your preferences, like choosing the dataset, the number of voters and the number of simulations.
+## Note: paper results reproduction
+The code for reproducing the original [AAAI-2022 paper](https://ojs.aaai.org/index.php/AAAI/article/view/20403)'s experiments 📚🧪📊, introducing the **vote-size-matters** crowdsourcing data labelling method, has been moved to a [dedicated repo](https://github.com/taharallouche/truth-tracking-aaai-2022).
 
