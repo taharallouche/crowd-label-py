@@ -21,7 +21,7 @@ class JaccardAggregator(WeightedAggregator):
     @staticmethod
     def compute_weights(annotations: pd.DataFrame) -> pd.Series:
         vote_size = annotations.sum(axis=1)
-        assert np.all(vote_size > 0), "Jaccard weights are not defined for empty votes"
+        assert np.all(vote_size > 0), "Jaccard weights are not defined for empty votes."
         return 1 / vote_size
 
 
