@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 
-from crowd_label.core.utils.inventory import COLUMNS
+from hakeem.core.utils.inventory import COLUMNS
 
 
 class Aggregator(ABC):

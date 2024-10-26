@@ -1,5 +1,5 @@
 [project]
-name = "crowd-label-py"
+name = "hakeem"
 version = "0.1.0"
 requires-python  = ">= 3.12"
 authors = "Tahar Allouche"
@@ -17,14 +17,14 @@ dependencies = [
 
 
 [tool.poetry]
-name = 'crowd-label-py'
+name = 'hakeem'
 version = '0.0.1'
 description = "Minimalistic collective data labeling tools"
 authors = [
     "Tahar Allouche <tahar.allouche.pro@gmail.com>",
 ]
 packages = [
-    { include = "crowd_label" },
+    { include = "hakeem" },
 ]
 
 [tool.poetry.dependencies]

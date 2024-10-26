@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from crowd_label.core.utils.inventory import COLUMNS, Dataset
+from hakeem.core.utils.inventory import COLUMNS, Dataset
 
 
 def _get_column_names(name: str, nbr_questions: int) -> list[str]:

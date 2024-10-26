@@ -1,13 +1,13 @@
 import pandas as pd
 import pytest
 
-from crowd_label.core.utils.inventory import COLUMNS
+from hakeem.core.utils.inventory import COLUMNS
 
 
 @pytest.mark.ut
 def test_VoterMixin_handles_empty_input():
 	# Given
-	from crowd_label.core.aggregation.base import VoterMixin
+	from hakeem.core.aggregation.base import VoterMixin
 
 	annotations = pd.DataFrame(
 		columns=["a", "b"],
@@ -52,7 +52,7 @@ def test_Voter_Mixin_get_aggregated_labels_handles_one_question(
 	weighted_votes: pd.DataFrame, expected_result: pd.DataFrame
 ) -> None:
 	# Given
-	from crowd_label.core.aggregation.base import VoterMixin
+	from hakeem.core.aggregation.base import VoterMixin
 
 	# When
 	result = VoterMixin._get_aggregated_labels(weighted_votes)

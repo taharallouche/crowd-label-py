@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from crowd_label.core.utils.utils import get_mean_confidence_interval
+from hakeem.core.utils.utils import get_mean_confidence_interval
 
 
 @pytest.mark.ut

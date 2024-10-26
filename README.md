@@ -1,4 +1,4 @@
-# :globe_with_meridians: :ballot_box: crowd-label-py :ballot_box: :globe_with_meridians:
+# :mage_man: hakeem :mage_man:
 
 This python package serves two purposes:
 1. Ensures the reporucibility of my [AAAI-2022 paper](https://ojs.aaai.org/index.php/AAAI/article/view/20403)'s experiments, introducing the **vote-size-matters** crowdsourcing data labelling method. 📚🧪📊
@@ -6,7 +6,7 @@ This python package serves two purposes:
 
 
 ## The vote-size-matters collective labelling method
-If you possess an unlabeled dataset comprising 📷 images, 🔊 sounds, 🎥 videos, or ✉️ texts, and you have collected some crowdsourced annotations with the aim of aggregating them optimally to deduce the correct label for each instance, then crowd-label-py is the solution you're seeking! 🚀 
+If you possess an unlabeled dataset comprising 📷 images, 🔊 sounds, 🎥 videos, or ✉️ texts, and you have collected some crowdsourced annotations with the aim of aggregating them optimally to deduce the correct label for each instance, then `hakeem` is the solution you're seeking! 🚀 
 
 The package implements the size-matters truth tracking principle, 💡 which has consistently shown superior performance compared to other voter-agnostic aggregation rules :chart_with_upwards_trend:. One notable advantage of this method is its reliance on a simple intuition, making the results it produces entirely explainable! :dart:🌟
 
