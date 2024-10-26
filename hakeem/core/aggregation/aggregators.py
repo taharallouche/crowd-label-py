@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from crowd_label.core.aggregation.base import WeightedAggregator
-from crowd_label.core.utils.inventory import DEFAULT_RELIABILITY_BOUNDS
+from hakeem.core.aggregation.base import WeightedAggregator
+from hakeem.core.utils.inventory import DEFAULT_RELIABILITY_BOUNDS
 
 
 class CondorcetAggregator(WeightedAggregator):

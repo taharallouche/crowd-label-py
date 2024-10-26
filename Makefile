@@ -49,7 +49,7 @@ clean-test: ## remove test and coverage artifacts
 
 
 typing-py: ## check typing
-	mypy crowd_label --ignore-missing-imports
+	mypy hakeem --ignore-missing-imports
 
 lint:
 	ruff check
@@ -60,15 +60,15 @@ test:  ## run tests quickly with the default Python
 test-all: lint typing-py test 
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source crowd_label -m pytest
+	coverage run --source hakeem -m pytest
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
 build-docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/crowd_label.rst
+	rm -f docs/hakeem.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ crowd_label
+	sphinx-apidoc -o docs/ hakeem
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 
@@ -87,4 +87,4 @@ dist: clean ## builds source and wheel package
 	ls -l dist
 
 reproduce: ## reproduce the results
-	python -m crowd_label.paper_results.main
+	python -m hakeem.paper_results.main
