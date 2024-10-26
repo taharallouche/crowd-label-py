@@ -10,8 +10,8 @@ def test_compare_methods() -> None:
 	# Given
 	import random
 
-	from hakeem.core.utils.inventory import COLUMNS, DATASETS
 	from hakeem.paper_results.evaluation.accuracy import compare_methods
+	from hakeem.paper_results.inventory import COLUMNS, DATASETS
 
 	random.seed(42)
 	dataset = DATASETS["animals"]
