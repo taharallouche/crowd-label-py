@@ -1,13 +1,13 @@
 import pandas as pd
 import pytest
 
-from hakeem.core.utils.inventory import COLUMNS
+from hakeem.utils.inventory import COLUMNS
 
 
 @pytest.mark.ut
 def test_WeightedApprovalMixin_handles_empty_input():
     # Given
-    from hakeem.core.aggregation.base import WeightedApprovalMixin
+    from hakeem.aggregation.base import WeightedApprovalMixin
 
     annotations = pd.DataFrame(
         columns=["a", "b"],
@@ -54,7 +54,7 @@ def test_Voter_Mixin_get_aggregated_labels_handles_one_question(
     weighted_votes: pd.DataFrame, expected_result: pd.DataFrame
 ) -> None:
     # Given
-    from hakeem.core.aggregation.base import WeightedApprovalMixin
+    from hakeem.aggregation.base import WeightedApprovalMixin
 
     # When
     result = WeightedApprovalMixin._aggregate_weighted_answers(

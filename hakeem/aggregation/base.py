@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 
 import pandas as pd
 
-from hakeem.core.utils.coerce import coerce_schema
-from hakeem.core.utils.inventory import COLUMNS
+from hakeem.utils.coerce import coerce_schema
+from hakeem.utils.inventory import COLUMNS
 
 
 class Aggregator(ABC):

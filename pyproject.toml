@@ -1,19 +1,16 @@
 [project]
 name = "hakeem"
-version = "0.1.0"
+version = "1.0.0"
 requires-python  = ">= 3.12"
 readme = "README.md"
 dependencies = [
-    "matplotlib>=3.9.2",
     "pandas>=2.2.3",
-    "scikit-learn>=1.5.2",
-    "tqdm>=4.66.5",
 ]
 
 
 [tool.poetry]
 name = 'hakeem'
-version = '0.1.1'
+version = '1.0.0'
 description = "Minimalistic collective data labeling tools"
 authors = [
     "Tahar Allouche <tahar.allouche.pro@gmail.com>",

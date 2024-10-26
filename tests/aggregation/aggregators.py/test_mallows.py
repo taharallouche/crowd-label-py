@@ -26,7 +26,7 @@ def test_StandardApprovalAggregator_compute_weights(
     annotations: pd.DataFrame, expected_result: pd.Series
 ) -> None:
     # Given
-    from hakeem.core.aggregation.aggregators.mallows import StandardApprovalAggregator
+    from hakeem.aggregation.aggregators.mallows import StandardApprovalAggregator
 
     # When
     result = StandardApprovalAggregator().compute_weights(annotations)
@@ -61,7 +61,7 @@ def test_JaccardAggregator_compute_weights(
     annotations: pd.DataFrame, expected_result: pd.Series
 ) -> None:
     # Given
-    from hakeem.core.aggregation.aggregators.mallows import JaccardAggregator
+    from hakeem.aggregation.aggregators.mallows import JaccardAggregator
 
     # When
     result = JaccardAggregator().compute_weights(annotations)
@@ -100,7 +100,7 @@ def test_JaccardAggregator_handles_empty_votes(
     annotations: pd.DataFrame, expected_result: pd.Series
 ) -> None:
     # Given
-    from hakeem.core.aggregation.aggregators.mallows import JaccardAggregator
+    from hakeem.aggregation.aggregators.mallows import JaccardAggregator
 
     aggregator = JaccardAggregator(task_column="task", worker_column="worker")
 
@@ -145,7 +145,7 @@ def test_JaccardAggregator_raises_on_empty_vote(
     annotations: pd.DataFrame, expectation: AbstractContextManager
 ) -> None:
     # Given
-    from hakeem.core.aggregation.aggregators.mallows import JaccardAggregator
+    from hakeem.aggregation.aggregators.mallows import JaccardAggregator
 
     aggregator = JaccardAggregator(task_column="task", worker_column="worker")
 

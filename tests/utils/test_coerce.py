@@ -96,7 +96,7 @@ def test_coerce_schema(
     expected_result: pd.DataFrame,
 ):
     # Given
-    from hakeem.core.utils.coerce import coerce_schema
+    from hakeem.utils.coerce import coerce_schema
 
     # When
     result = coerce_schema(annotations, task_column, worker_column)
