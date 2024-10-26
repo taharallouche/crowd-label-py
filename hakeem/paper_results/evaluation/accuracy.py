@@ -18,8 +18,8 @@ from hakeem.core.aggregation.aggregators import (
 	StandardApprovalAggregator,
 )
 from hakeem.core.aggregation.base import Aggregator
-from hakeem.core.utils.inventory import COLUMNS
 from hakeem.core.utils.utils import get_mean_confidence_interval
+from hakeem.paper_results.inventory import COLUMNS
 
 logging.basicConfig(
 	level=logging.INFO, format="'%(asctime)s - %(levelname)s - %(message)s'"

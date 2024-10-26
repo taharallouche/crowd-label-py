@@ -2,11 +2,11 @@ from pathlib import Path
 
 import pandas as pd
 
-from hakeem.core.utils.inventory import COLUMNS, DATASETS
 from hakeem.paper_results.evaluation.accuracy import (
 	compare_methods,
 	plot_accuracies,
 )
+from hakeem.paper_results.inventory import COLUMNS, DATASETS
 
 
 def _process_dataset() -> None:

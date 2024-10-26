@@ -3,14 +3,14 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from hakeem.core.utils.inventory import COLUMNS
+from hakeem.paper_results.inventory import COLUMNS
 
 
 @pytest.mark.e2e
 @pytest.mark.parametrize("dataset", ["animals", "languages", "textures"])
 def test_prepare_data(dataset) -> None:
 	# With
-	from hakeem.core.utils.inventory import DATASETS
+	from hakeem.paper_results.inventory import DATASETS
 	from hakeem.paper_results.parsing.data_preparation import prepare_data
 
 	dataset = DATASETS[dataset]
