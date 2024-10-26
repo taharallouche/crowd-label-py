@@ -1,6 +1,6 @@
 [format]
-indent-style = "tab"
 docstring-code-format = true
+indent-style = "space"
 
 
 
