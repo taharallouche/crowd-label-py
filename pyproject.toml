@@ -13,7 +13,7 @@ dependencies = [
 
 [tool.poetry]
 name = 'hakeem'
-version = '0.1.0'
+version = '0.1.1'
 description = "Minimalistic collective data labeling tools"
 authors = [
     "Tahar Allouche <tahar.allouche.pro@gmail.com>",
@@ -21,6 +21,10 @@ authors = [
 packages = [
     { include = "hakeem" },
 ]
+
+[tool.poetry.dependencies]
+python = '^3.12'
+pandas = '^2.2.3'
 
 
 [build-system]
