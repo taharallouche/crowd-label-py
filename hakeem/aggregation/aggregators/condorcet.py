@@ -18,13 +18,21 @@ class CondorcetAggregator(WeightedAggregator):
         self.upper_reliability_bound = upper_reliability_bound
 
     def compute_weights(self, annotations: pd.DataFrame) -> pd.Series:
+        reliabilities = self._compute_reliabilities(annotations)
+        assert np.all(
+            (reliabilities > 0) & (reliabilities < 1)
+        ), "Reliabilities must be in (0, 1)."
+
+        return np.log(reliabilities / (1 - reliabilities))
+
+    def _compute_reliabilities(self, annotations: pd.DataFrame) -> pd.Series:
         vote_size = annotations.sum(axis=1)
+
+        assert len(annotations.columns) > 2, "At least 3 labels are required currently."
         reliabilities = (len(annotations.columns) - vote_size - 1) / (
             len(annotations.columns) - 2
         )
         reliabilities = reliabilities.clip(
             self.lower_reliability_bound, self.upper_reliability_bound
         )
-        weights = np.log(reliabilities / (1 - reliabilities))
-
-        return weights
+        return reliabilities
