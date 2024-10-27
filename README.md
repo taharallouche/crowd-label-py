@@ -15,6 +15,14 @@ In fact, the method's key principles include:
 
 Various weighting schemes are provided to the user, with each one being optimal under different assumptions. The choice of the right scheme is yours to make!
 
+## Installation
+
+You can install the `hakeem` package directly from `PyPi` using `pip`:
+
+```bash
+pip install hakeem
+```
+
 ## Note: paper results reproduction
 The code for reproducing the original [AAAI-2022 paper](https://ojs.aaai.org/index.php/AAAI/article/view/20403)'s experiments 📚🧪📊, benchmarking the **vote-size-matters** crowdsourcing data labelling method, has been moved to a [dedicated repo](https://github.com/taharallouche/truth-tracking-aaai-2022).
 
