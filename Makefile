@@ -59,6 +59,9 @@ test:  ## run tests quickly with the default Python
 
 test-all: lint typing-py test 
 
+uv-test-all:
+	uv run make test-all
+
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source hakeem -m pytest
 	coverage report -m
