@@ -183,3 +183,31 @@ def test_CondorcetAggregator_compute_weights(
 
     # Then
     pd.testing.assert_series_equal(expected_result, result, rtol=1e-5)
+
+
+@pytest.mark.ut
+def test_CondorcetAggregator__compute_reliabilities_handles_two_alternatives() -> None:
+    # Given
+    from hakeem.aggregation.aggregators.condorcet import CondorcetAggregator
+
+    annotations = pd.DataFrame(
+        {
+            "task": ["q1", "q1", "q2"],
+            "worker": ["v1", "v2", "v1"],
+            "a": [1, 1, 0],
+            "b": [0, 1, 1],
+        }
+    ).set_index(["task", "worker"])
+
+    expected_reliabilities = pd.Series(
+        [0.5, 0.5, 0.5],
+        index=pd.MultiIndex.from_tuples(
+            [("q1", "v1"), ("q1", "v2"), ("q2", "v1")], names=["task", "worker"]
+        ),
+    )
+
+    # When
+    result = CondorcetAggregator()._compute_reliabilities(annotations)
+
+    # Then
+    pd.testing.assert_series_equal(expected_reliabilities, result)
