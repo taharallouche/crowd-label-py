@@ -28,7 +28,12 @@ class CondorcetAggregator(WeightedAggregator):
     def _compute_reliabilities(self, annotations: pd.DataFrame) -> pd.Series:
         vote_size = annotations.sum(axis=1)
 
-        assert len(annotations.columns) > 2, "At least 3 labels are required currently."
+        if len(annotations.columns) == 2:
+            # If there are only two alternatives, only the votes selecting one label
+            # are meaningful.
+            # Since they have equal sizes, we return a constant reliability.
+            return pd.Series(0.5, index=annotations.index)
+
         reliabilities = (len(annotations.columns) - vote_size - 1) / (
             len(annotations.columns) - 2
         )
