@@ -89,5 +89,3 @@ dist: clean ## builds source and wheel package
 	python setup.py bdist_wheel
 	ls -l dist
 
-reproduce: ## reproduce the results
-	python -m hakeem.paper_results.main
